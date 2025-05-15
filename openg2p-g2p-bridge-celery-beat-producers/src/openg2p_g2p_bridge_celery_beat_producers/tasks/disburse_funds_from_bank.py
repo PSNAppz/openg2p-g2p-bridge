@@ -70,7 +70,13 @@ def disburse_funds_from_bank_beat_producer():
             .scalars()
             .all()
         )
+        _logger.info(
+            f"Found {len(envelopes)} envelopes with funds blocked with bank"
+        )
         for envelope in envelopes:
+            _logger.info(
+                f"Processing envelope {envelope.disbursement_envelope_id}"
+            )
             pending_batches = (
                 session.execute(
                     select(BankDisbursementBatchStatus)
