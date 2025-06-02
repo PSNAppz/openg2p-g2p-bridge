@@ -43,6 +43,7 @@ class CancellationStatus(Enum):
 class DisbursementEnvelope(BaseORMModelWithTimes):
     __tablename__ = "disbursement_envelopes"
     disbursement_envelope_id: Mapped[str] = mapped_column(String, unique=True)
+    benefit_code: Mapped[str] = mapped_column(String)
     benefit_program_mnemonic: Mapped[str] = mapped_column(String)
     disbursement_frequency: Mapped[DisbursementFrequency] = mapped_column(
         SqlEnum(DisbursementFrequency)

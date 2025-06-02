@@ -95,6 +95,87 @@
         }
       }
     },
+    "/create_disbursement_envelopes": {
+      "post": {
+        "tags": [
+          "G2P Bridge Disbursement Envelope"
+        ],
+        "summary": "Create Disbursement Envelopes",
+        "operationId": "create_disbursement_envelopes_create_disbursement_envelopes_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DisbursementEnvelopesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DisbursementEnvelopesResponse-Input"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/cancel_disbursement_envelope": {
       "post": {
         "tags": [
@@ -912,6 +993,13 @@
             ],
             "title": "Disbursement Envelope Id"
           },
+          "benefit_code": {
+            "anyOf": [
+              { "type": "string" },
+              { "type": "null" }
+            ],
+            "title": "Benefit Code"
+          },
           "benefit_program_mnemonic": {
             "anyOf": [
               {
@@ -1096,6 +1184,84 @@
           "header"
         ],
         "title": "DisbursementEnvelopeResponse"
+      },
+      "DisbursementEnvelopesRequest": {
+        "properties": {
+          "signature": {
+            "anyOf": [
+              { "type": "string" },
+              { "type": "null" }
+            ],
+            "title": "Signature"
+          },
+          "header": {
+            "$ref": "#/components/schemas/RequestHeader"
+          },
+          "message": {
+            "items": {
+              "$ref": "#/components/schemas/DisbursementEnvelopePayload"
+            },
+            "type": "array",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [ "header", "message" ],
+        "title": "DisbursementEnvelopesRequest"
+      },
+      "DisbursementEnvelopesResponse-Input": {
+        "properties": {
+          "signature": {
+            "anyOf": [
+              { "type": "string" },
+              { "type": "null" }
+            ],
+            "title": "Signature"
+          },
+          "header": {
+            "$ref": "#/components/schemas/SyncResponseHeader"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "items": { "$ref": "#/components/schemas/DisbursementEnvelopePayload" },
+                "type": "array"
+              },
+              { "type": "null" }
+            ],
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [ "header" ],
+        "title": "DisbursementEnvelopesResponse"
+      },
+      "DisbursementEnvelopesResponse-Output": {
+        "properties": {
+          "signature": {
+            "anyOf": [
+              { "type": "string" },
+              { "type": "null" }
+            ],
+            "title": "Signature"
+          },
+          "header": {
+            "$ref": "#/components/schemas/SyncResponseHeader"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "items": { "$ref": "#/components/schemas/DisbursementEnvelopePayload" },
+                "type": "array"
+              },
+              { "type": "null" }
+            ],
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [ "header" ],
+        "title": "DisbursementEnvelopesResponse"
       },
       "DisbursementEnvelopeStatusRequest": {
         "properties": {
