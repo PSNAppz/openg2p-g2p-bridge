@@ -13,6 +13,8 @@ from .disbursement_envelope import (
     DisbursementEnvelopePayload,
     DisbursementEnvelopeRequest,
     DisbursementEnvelopeResponse,
+    DisbursementEnvelopesRequest,
+    DisbursementEnvelopesResponse,
 )
 from .disbursement_status import (
     DisbursementEnvelopeBatchStatusPayload,

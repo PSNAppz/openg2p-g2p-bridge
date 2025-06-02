@@ -9,6 +9,8 @@ from openg2p_g2p_bridge_models.schemas import (
     DisbursementEnvelopePayload,
     DisbursementEnvelopeRequest,
     DisbursementEnvelopeResponse,
+    DisbursementEnvelopesRequest,
+    DisbursementEnvelopesResponse,
 )
 from openg2p_g2pconnect_common_lib.schemas import (
     RequestHeader,
@@ -44,6 +46,36 @@ def mock_create_disbursement_envelope(is_valid, error_code=None):
         message=disbursement_envelope_payload,
     )
     return disbursement_envelope_response
+
+
+def mock_create_disbursement_envelopes(is_valid, error_code=None):
+    if not is_valid:
+        raise DisbursementEnvelopeException(code=error_code, message=f"{error_code} error.")
+
+    payloads = [
+        DisbursementEnvelopePayload(
+            disbursement_envelope_id="env123",
+            benefit_code="BEN001",
+            benefit_program_mnemonic="TEST123",
+            disbursement_frequency="Monthly",
+            cycle_code_mnemonic="CYCLE42",
+            number_of_beneficiaries=100,
+            number_of_disbursements=100,
+            total_disbursement_amount=5000.00,
+            disbursement_schedule_date=datetime.date(datetime.now()),
+        )
+    ]
+    response = DisbursementEnvelopesResponse(
+        header=SyncResponseHeader(
+            message_id="",
+            message_ts=datetime.now().isoformat(),
+            action="",
+            status=StatusEnum.succ,
+            status_reason_message="",
+        ),
+        message=payloads,
+    )
+    return response
 
 
 @pytest.mark.asyncio
@@ -166,6 +198,95 @@ async def test_create_disbursement_envelope_errors(
     actual_response = await controller.create_disbursement_envelope(
         request_payload, is_signature_valid=True
     )
+
+    assert (
+        actual_response == error_response
+    ), f"The response did not match the expected error response for {error_code}."
+
+
+@pytest.mark.asyncio
+@patch("openg2p_g2p_bridge_api.services.DisbursementEnvelopeService.get_component")
+@patch("openg2p_g2p_bridge_api.services.RequestValidation.get_component")
+async def test_create_disbursement_envelopes_success(
+    mock_request_validation, mock_service_get_component
+):
+    mock_request_validation.validate_signature.return_value = None
+    mock_request_validation.validate_request.return_value = None
+    mock_request_validation.validate_create_disbursement_envelope_request_header.return_value = None
+
+    mock_service_instance = AsyncMock()
+    mock_payloads = mock_create_disbursement_envelopes(True).message
+    mock_service_instance.create_disbursement_envelopes = AsyncMock(return_value=mock_payloads)
+    expected_response = mock_create_disbursement_envelopes(True)
+    mock_service_instance.construct_disbursement_envelopes_success_response = AsyncMock(return_value=expected_response)
+    mock_service_get_component.return_value = mock_service_instance
+
+    controller = DisbursementEnvelopeController()
+    request_payload = DisbursementEnvelopesRequest(
+        header=RequestHeader(
+            message_id="123",
+            message_ts=datetime.now().isoformat(),
+            action="",
+            sender_id="",
+            sender_uri="",
+            receiver_id="",
+            total_count=1,
+            is_msg_encrypted=False,
+        ),
+        message=mock_payloads,
+    )
+
+    actual_response = await controller.create_disbursement_envelopes(request_payload, is_signature_valid=True)
+
+    assert actual_response == expected_response
+
+
+@pytest.mark.asyncio
+@patch("openg2p_g2p_bridge_api.services.DisbursementEnvelopeService.get_component")
+@patch("openg2p_g2p_bridge_api.services.RequestValidation.get_component")
+@pytest.mark.parametrize("error_code", list(G2PBridgeErrorCodes))
+async def test_create_disbursement_envelopes_errors(
+    mock_request_validation, mock_service_get_component, error_code
+):
+    mock_request_validation.validate_signature.return_value = None
+    mock_request_validation.validate_request.return_value = None
+    mock_request_validation.validate_create_disbursement_envelope_request_header.return_value = None
+
+    mock_service_instance = AsyncMock()
+    mock_service_instance.create_disbursement_envelopes.side_effect = lambda req: (
+        mock_create_disbursement_envelopes(False, error_code)
+    )
+    mock_service_instance.construct_disbursement_envelopes_error_response = AsyncMock()
+    mock_service_get_component.return_value = mock_service_instance
+
+    error_response = DisbursementEnvelopesResponse(
+        header=SyncResponseHeader(
+            message_id="",
+            message_ts=datetime.now().isoformat(),
+            action="",
+            status=StatusEnum.rjct,
+            status_reason_message=error_code,
+        ),
+        message=[],
+    )
+    mock_service_instance.construct_disbursement_envelopes_error_response.return_value = error_response
+
+    controller = DisbursementEnvelopeController()
+    request_payload = DisbursementEnvelopesRequest(
+        header=RequestHeader(
+            message_id="123",
+            message_ts=datetime.now().isoformat(),
+            action="",
+            sender_id="",
+            sender_uri="",
+            receiver_id="",
+            total_count=1,
+            is_msg_encrypted=False,
+        ),
+        message=[],
+    )
+
+    actual_response = await controller.create_disbursement_envelopes(request_payload, is_signature_valid=True)
 
     assert (
         actual_response == error_response

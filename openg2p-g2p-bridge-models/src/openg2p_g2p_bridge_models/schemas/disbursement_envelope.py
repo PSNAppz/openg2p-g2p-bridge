@@ -1,6 +1,8 @@
 import datetime
 from typing import Optional
 
+from typing import List
+
 from openg2p_g2pconnect_common_lib.schemas import Request, SyncResponse
 from pydantic import BaseModel
 
@@ -10,6 +12,7 @@ from ..models import DisbursementFrequency
 class DisbursementEnvelopePayload(BaseModel):
     id: Optional[str] = None
     disbursement_envelope_id: Optional[str] = None
+    benefit_code: Optional[str] = None
     benefit_program_mnemonic: Optional[str] = None
     disbursement_frequency: Optional[DisbursementFrequency] = None
     cycle_code_mnemonic: Optional[str] = None
@@ -26,3 +29,15 @@ class DisbursementEnvelopeRequest(Request):
 
 class DisbursementEnvelopeResponse(SyncResponse):
     message: Optional[DisbursementEnvelopePayload] = None
+
+
+class DisbursementEnvelopesRequest(Request):
+    """Request schema for creating multiple envelopes."""
+
+    message: List[DisbursementEnvelopePayload]
+
+
+class DisbursementEnvelopesResponse(SyncResponse):
+    """Response schema containing created envelopes."""
+
+    message: Optional[List[DisbursementEnvelopePayload]] = None
