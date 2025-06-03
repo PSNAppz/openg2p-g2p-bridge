@@ -1,0 +1,1 @@
+from .warehouse_connector_interface import WarehouseConnectorInterface
