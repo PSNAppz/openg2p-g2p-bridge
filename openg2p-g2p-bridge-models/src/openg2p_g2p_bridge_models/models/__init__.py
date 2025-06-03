@@ -14,6 +14,10 @@ from .disbursement import (
     MapperResolutionBatchStatus,
     MapperResolutionDetails,
     MapperResolvedFaType,
+    AgencyAllocationBatchStatus,
+    AgencyAllocationDetails,
+    WarehouseAllocationBatchStatus,
+    WarehouseAllocationDetails,
 )
 from .disbursement_envelope import (
     CancellationStatus,

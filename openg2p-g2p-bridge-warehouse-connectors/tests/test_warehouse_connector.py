@@ -11,5 +11,5 @@ def test_factory_returns_example_connector():
 
 def test_example_warehouse_connector():
     connector = ExampleWarehouseConnector()
-    details = connector.get_warehouse_resolution_details(["EXAMPLE"], "BEN001")
+    details = connector.allocate_warehouse(["EXAMPLE"])
     assert details == {"warehouse_code": "EXAMPLE", "name": "Example Warehouse"}

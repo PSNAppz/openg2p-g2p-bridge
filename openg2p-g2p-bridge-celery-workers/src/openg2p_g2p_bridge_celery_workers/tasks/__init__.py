@@ -10,4 +10,8 @@ from .disburse_funds_from_bank import (
 from .mapper_resolution_task import (
     mapper_resolution_worker,
 )
+from .agency_warehouse_allocation_task import (
+    agency_allocation_worker,
+    warehouse_allocation_worker,
+)
 from .mt940_processor import mt940_processor_worker

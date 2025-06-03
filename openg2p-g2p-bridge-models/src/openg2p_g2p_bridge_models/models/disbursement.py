@@ -107,6 +107,56 @@ class MapperResolutionDetails(BaseORMModelWithTimes):
     )
 
 
+class AgencyAllocationBatchStatus(BaseORMModelWithTimes):
+    __tablename__ = "agency_allocation_batch_statuses"
+
+    agency_allocation_batch_id = mapped_column(
+        UUID, nullable=True, default=None, index=True, unique=True
+    )
+    allocation_status: Mapped[ProcessStatus] = mapped_column(
+        SqlEnum(ProcessStatus), default=ProcessStatus.PENDING
+    )
+    allocation_time_stamp: Mapped[datetime] = mapped_column(
+        DateTime, nullable=True, default=None
+    )
+    latest_error_code: Mapped[str] = mapped_column(String, nullable=True, default=None)
+    allocation_attempts: Mapped[int] = mapped_column(Integer, nullable=True, default=0)
+
+
+class AgencyAllocationDetails(BaseORMModelWithTimes):
+    __tablename__ = "agency_allocation_details"
+
+    agency_allocation_batch_id = mapped_column(
+        UUID, nullable=True, default=None, index=True
+    )
+    agency_code: Mapped[str] = mapped_column(String, index=True)
+
+
+class WarehouseAllocationBatchStatus(BaseORMModelWithTimes):
+    __tablename__ = "warehouse_allocation_batch_statuses"
+
+    warehouse_allocation_batch_id = mapped_column(
+        UUID, nullable=True, default=None, index=True, unique=True
+    )
+    allocation_status: Mapped[ProcessStatus] = mapped_column(
+        SqlEnum(ProcessStatus), default=ProcessStatus.PENDING
+    )
+    allocation_time_stamp: Mapped[datetime] = mapped_column(
+        DateTime, nullable=True, default=None
+    )
+    latest_error_code: Mapped[str] = mapped_column(String, nullable=True, default=None)
+    allocation_attempts: Mapped[int] = mapped_column(Integer, nullable=True, default=0)
+
+
+class WarehouseAllocationDetails(BaseORMModelWithTimes):
+    __tablename__ = "warehouse_allocation_details"
+
+    warehouse_allocation_batch_id = mapped_column(
+        UUID, nullable=True, default=None, index=True
+    )
+    warehouse_code: Mapped[str] = mapped_column(String, index=True)
+
+
 class BankDisbursementBatchStatus(BaseORMModelWithTimes):
     __tablename__ = "bank_disbursement_batch_statuses"
 

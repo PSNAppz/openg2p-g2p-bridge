@@ -42,6 +42,14 @@ celery_app.conf.beat_schedule = {
         "task": "mapper_resolution_beat_producer",
         "schedule": _config.mapper_resolve_frequency,
     },
+    "agency_allocation_beat_producer": {
+        "task": "agency_allocation_beat_producer",
+        "schedule": _config.mapper_resolve_frequency,
+    },
+    "warehouse_allocation_beat_producer": {
+        "task": "warehouse_allocation_beat_producer",
+        "schedule": _config.mapper_resolve_frequency,
+    },
     "check_funds_with_bank_beat_producer": {
         "task": "check_funds_with_bank_beat_producer",
         "schedule": _config.funds_available_check_frequency,

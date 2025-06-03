@@ -27,3 +27,11 @@ from .disbursement_status import (
     DisbursementStatusRequest,
     DisbursementStatusResponse,
 )
+from .allocation import (
+    AgencyAllocationDetail,
+    AgencyAllocationRequest,
+    AgencyAllocationResponse,
+    WarehouseAllocationDetail,
+    WarehouseAllocationRequest,
+    WarehouseAllocationResponse,
+)
