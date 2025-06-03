@@ -40,6 +40,17 @@ class CancellationStatus(Enum):
     Cancelled = "Cancelled"
 
 
+class BenefitType(Enum):
+    CASH = "CASH"
+    COMMODITY = "COMMODITY"
+    COMBINATION = "COMBINATION"
+
+
+class DistributionModeForCash(Enum):
+    PHYSICAL = "Physical"
+    DIGITAL = "Digital"
+
+
 class DisbursementEnvelope(BaseORMModelWithTimes):
     __tablename__ = "disbursement_envelopes"
     disbursement_envelope_id: Mapped[str] = mapped_column(String, unique=True)
@@ -53,6 +64,8 @@ class DisbursementEnvelope(BaseORMModelWithTimes):
     number_of_disbursements: Mapped[int] = mapped_column(Integer)
     total_disbursement_quantity: Mapped[float] = mapped_column(Integer)
     measurement_unit: Mapped[str] = mapped_column(String)
+    benefit_type: Mapped[BenefitType] = mapped_column(SqlEnum(BenefitType))
+    distribution_mode_for_cash: Mapped[DistributionModeForCash] = mapped_column(SqlEnum(DistributionModeForCash), nullable=True)
     disbursement_currency_code: Mapped[str] = mapped_column(String)
     disbursement_schedule_date: Mapped[datetime.date] = mapped_column(Date())
     receipt_time_stamp: Mapped[datetime] = mapped_column(

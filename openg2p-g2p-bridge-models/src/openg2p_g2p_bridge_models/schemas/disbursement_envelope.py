@@ -20,6 +20,8 @@ class DisbursementEnvelopePayload(BaseModel):
     measurement_unit: Optional[str] = None
     disbursement_currency_code: Optional[str] = None
     disbursement_schedule_date: Optional[datetime.date] = None
+    benefit_type: Optional[str] = None
+    distribution_mode_for_cash: Optional[str] = None
 
 
 class DisbursementEnvelopeRequest(Request):

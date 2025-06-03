@@ -52,7 +52,7 @@ class MockSession:
             disbursement_id="test_disbursement_id",
             beneficiary_id="test_beneficiary",
             beneficiary_name="Test Beneficiary",
-            disbursement_amount=100,
+            disbursement_quantity=100,
             narrative="Test payment",
         )
         self.disbursement_batch_control = DisbursementBatchControl(

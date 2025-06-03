@@ -156,7 +156,7 @@ class DisbursementService(BaseService):
             disbursements
         )
         disbursement_envelope_batch_status.total_disbursement_quantity_received += sum(
-            d.disbursement_amount for d in disbursements
+            d.disbursement_quantity for d in disbursements
         )
         _logger.info("Disbursement Envelope Batch Status Updated!")
         return disbursement_envelope_batch_status
@@ -176,7 +176,7 @@ class DisbursementService(BaseService):
                 mis_reference_number=disbursement_payload.mis_reference_number,
                 beneficiary_id=disbursement_payload.beneficiary_id,
                 beneficiary_name=disbursement_payload.beneficiary_name,
-                disbursement_amount=disbursement_payload.disbursement_amount,
+                disbursement_quantity=disbursement_payload.disbursement_quantity,
                 narrative=disbursement_payload.narrative,
                 active=True,
             )
@@ -218,7 +218,7 @@ class DisbursementService(BaseService):
                 disbursement_payload.response_error_codes.append(
                     G2PBridgeErrorCodes.INVALID_DISBURSEMENT_ENVELOPE_ID
                 )
-            if disbursement_payload.disbursement_amount <= 0:
+            if disbursement_payload.disbursement_quantity <= 0:
                 disbursement_payload.response_error_codes.append(
                     G2PBridgeErrorCodes.INVALID_DISBURSEMENT_AMOUNT
                 )
@@ -308,7 +308,7 @@ class DisbursementService(BaseService):
         total_disbursement_quantity_after_this_request = (
             sum(
                 [
-                    disbursement_payload.disbursement_amount
+                    disbursement_payload.disbursement_quantity
                     for disbursement_payload in disbursement_payloads
                 ]
             )
@@ -456,12 +456,7 @@ class DisbursementService(BaseService):
                 disbursements_in_db
             )
             disbursement_envelope_batch_status.total_disbursement_quantity_received -= (
-                sum(
-                    [
-                        disbursement.disbursement_amount
-                        for disbursement in disbursements_in_db
-                    ]
-                )
+                sum(d.disbursement_quantity for d in disbursements_in_db)
             )
 
             session.add_all(disbursements_in_db)
@@ -630,7 +625,7 @@ class DisbursementService(BaseService):
             disbursements_in_db
         )
         total_qty_after = batch_status.total_disbursement_quantity_received - sum(
-            d.disbursement_amount for d in disbursements_in_db
+            d.disbursement_quantity for d in disbursements_in_db
         )
 
         if no_of_after < 0:

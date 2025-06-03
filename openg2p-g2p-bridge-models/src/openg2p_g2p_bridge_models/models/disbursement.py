@@ -29,7 +29,7 @@ class Disbursement(BaseORMModelWithTimes):
     disbursement_envelope_id: Mapped[str] = mapped_column(String, index=True)
     beneficiary_id: Mapped[str] = mapped_column(String)
     beneficiary_name: Mapped[str] = mapped_column(String)
-    disbursement_amount: Mapped[float] = mapped_column(Float)
+    disbursement_quantity: Mapped[float] = mapped_column(Float)
     narrative: Mapped[str] = mapped_column(String)
     receipt_time_stamp: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow
