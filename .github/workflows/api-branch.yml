@@ -61,7 +61,7 @@ jobs:
           python -m pip install git+https://github.com/openg2p/openg2p-fastapi-common@v1.1.2\#subdirectory=openg2p-fastapi-common
           python -m pip install git+https://github.com/openg2p/openg2p-fastapi-common@v1.1.2\#subdirectory=openg2p-fastapi-auth
           python -m pip install git+https://github.com/openg2p/openg2p-g2pconnect-common@v1.1.0\#subdirectory=openg2p-g2pconnect-common-lib
-          python -m pip install git+https://github.com/openg2p/openg2p-g2p-bridge@v1.1.0\#subdirectory=openg2p-g2p-bridge-models
+          python -m pip install git+https://github.com/psnappz/openg2p-g2p-bridge@2.0\#subdirectory=openg2p-g2p-bridge-models
           python -m pip install openg2p-g2p-bridge-api==1.1.0
       - name: Generate openapi json
         run: |

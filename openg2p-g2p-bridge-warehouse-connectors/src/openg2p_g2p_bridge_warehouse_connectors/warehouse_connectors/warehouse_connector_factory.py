@@ -1,6 +1,8 @@
 from openg2p_fastapi_common.service import BaseService
 
-from ..warehouse_interface.warehouse_connector_interface import WarehouseConnectorInterface
+from ..warehouse_interface.warehouse_connector_interface import (
+    WarehouseConnectorInterface,
+)
 from .example_warehouse_connector import ExampleWarehouseConnector
 
 
