@@ -58,7 +58,7 @@ class DisbursementEnvelopeStatusService(BaseService):
                 disbursement_envelope_batch_status_payload = DisbursementEnvelopeBatchStatusPayload(
                     disbursement_envelope_id=disbursement_envelope_batch_status.disbursement_envelope_id,
                     number_of_disbursements_received=disbursement_envelope_batch_status.number_of_disbursements_received,
-                    total_disbursement_amount_received=disbursement_envelope_batch_status.total_disbursement_amount_received,
+                    total_disbursement_quantity_received=disbursement_envelope_batch_status.total_disbursement_quantity_received,
                     funds_available_with_bank=disbursement_envelope_batch_status.funds_available_with_bank,
                     funds_available_latest_timestamp=disbursement_envelope_batch_status.funds_available_latest_timestamp,
                     funds_available_latest_error_code=disbursement_envelope_batch_status.funds_available_latest_error_code,

@@ -51,7 +51,8 @@ class DisbursementEnvelope(BaseORMModelWithTimes):
     cycle_code_mnemonic: Mapped[str] = mapped_column(String)
     number_of_beneficiaries: Mapped[int] = mapped_column(Integer)
     number_of_disbursements: Mapped[int] = mapped_column(Integer)
-    total_disbursement_amount: Mapped[float] = mapped_column(Integer)
+    total_disbursement_quantity: Mapped[float] = mapped_column(Integer)
+    measurement_unit: Mapped[str] = mapped_column(String)
     disbursement_currency_code: Mapped[str] = mapped_column(String)
     disbursement_schedule_date: Mapped[datetime.date] = mapped_column(Date())
     receipt_time_stamp: Mapped[datetime] = mapped_column(
@@ -69,8 +70,7 @@ class DisbursementEnvelopeBatchStatus(BaseORMModelWithTimes):
     __tablename__ = "disbursement_envelope_batch_statuses"
     disbursement_envelope_id: Mapped[str] = mapped_column(String, unique=True)
     number_of_disbursements_received: Mapped[int] = mapped_column(Integer)
-    total_disbursement_amount_received: Mapped[int] = mapped_column(Integer)
-
+    total_disbursement_quantity_received: Mapped[int] = mapped_column(Integer)
     funds_available_with_bank: Mapped[FundsAvailableWithBankEnum] = mapped_column(
         String
     )

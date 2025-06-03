@@ -44,8 +44,8 @@ def check_funds_with_bank_beat_producer():
                     == CancellationStatus.Not_Cancelled.value,
                     DisbursementEnvelope.number_of_disbursements
                     == DisbursementEnvelopeBatchStatus.number_of_disbursements_received,
-                    DisbursementEnvelope.total_disbursement_amount
-                    == DisbursementEnvelopeBatchStatus.total_disbursement_amount_received,
+                    DisbursementEnvelope.total_disbursement_quantity
+                    == DisbursementEnvelopeBatchStatus.total_disbursement_quantity_received,
                     or_(
                         and_(
                             DisbursementEnvelopeBatchStatus.funds_available_with_bank

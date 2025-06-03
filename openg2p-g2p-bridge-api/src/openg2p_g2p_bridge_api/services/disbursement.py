@@ -155,7 +155,7 @@ class DisbursementService(BaseService):
         disbursement_envelope_batch_status.number_of_disbursements_received += len(
             disbursements
         )
-        disbursement_envelope_batch_status.total_disbursement_amount_received += sum(
+        disbursement_envelope_batch_status.total_disbursement_quantity_received += sum(
             d.disbursement_amount for d in disbursements
         )
         _logger.info("Disbursement Envelope Batch Status Updated!")
@@ -305,14 +305,14 @@ class DisbursementService(BaseService):
             len(disbursement_payloads)
             + disbursement_envelope_batch_status.number_of_disbursements_received
         )
-        total_disbursement_amount_after_this_request = (
+        total_disbursement_quantity_after_this_request = (
             sum(
                 [
                     disbursement_payload.disbursement_amount
                     for disbursement_payload in disbursement_payloads
                 ]
             )
-            + disbursement_envelope_batch_status.total_disbursement_amount_received
+            + disbursement_envelope_batch_status.total_disbursement_quantity_received
         )
 
         if (
@@ -326,11 +326,11 @@ class DisbursementService(BaseService):
             )
 
         if (
-            total_disbursement_amount_after_this_request
-            > disbursement_envelope.total_disbursement_amount
+            total_disbursement_quantity_after_this_request
+            > disbursement_envelope.total_disbursement_quantity
         ):
             raise DisbursementException(
-                G2PBridgeErrorCodes.TOTAL_DISBURSEMENT_AMOUNT_EXCEEDS_DECLARED,
+                G2PBridgeErrorCodes.TOTAL_DISBURSEMENT_QUANTITY_EXCEEDS_DECLARED,
                 disbursement_payloads,
             )
         _logger.info("Disbursement Envelope Validated!")
@@ -455,7 +455,7 @@ class DisbursementService(BaseService):
             disbursement_envelope_batch_status.number_of_disbursements_received -= len(
                 disbursements_in_db
             )
-            disbursement_envelope_batch_status.total_disbursement_amount_received -= (
+            disbursement_envelope_batch_status.total_disbursement_quantity_received -= (
                 sum(
                     [
                         disbursement.disbursement_amount
@@ -612,7 +612,7 @@ class DisbursementService(BaseService):
                 disbursement_payloads,
             )
 
-        # we don’t need a lock for this read
+        # we don't need a lock for this read
         batch_status = (
             (
                 await session.execute(
@@ -629,7 +629,7 @@ class DisbursementService(BaseService):
         no_of_after = batch_status.number_of_disbursements_received - len(
             disbursements_in_db
         )
-        total_amt_after = batch_status.total_disbursement_amount_received - sum(
+        total_qty_after = batch_status.total_disbursement_quantity_received - sum(
             d.disbursement_amount for d in disbursements_in_db
         )
 
@@ -640,10 +640,10 @@ class DisbursementService(BaseService):
                 disbursement_payloads,
             )
 
-        if total_amt_after < 0:
-            _logger.error("Total Disbursement Amount Less Than Zero!")
+        if total_qty_after < 0:
+            _logger.error("Total Disbursement Quantity Less Than Zero!")
             raise DisbursementException(
-                G2PBridgeErrorCodes.TOTAL_DISBURSEMENT_AMOUNT_LESS_THAN_ZERO,
+                G2PBridgeErrorCodes.TOTAL_DISBURSEMENT_QUANTITY_LESS_THAN_ZERO,
                 disbursement_payloads,
             )
 

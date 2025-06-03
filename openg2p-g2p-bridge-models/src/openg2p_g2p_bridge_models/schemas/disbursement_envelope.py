@@ -16,7 +16,8 @@ class DisbursementEnvelopePayload(BaseModel):
     cycle_code_mnemonic: Optional[str] = None
     number_of_beneficiaries: Optional[int] = None
     number_of_disbursements: Optional[int] = None
-    total_disbursement_amount: Optional[float] = None
+    total_disbursement_quantity: Optional[float] = None
+    measurement_unit: Optional[str] = None
     disbursement_currency_code: Optional[str] = None
     disbursement_schedule_date: Optional[datetime.date] = None
 

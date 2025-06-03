@@ -37,7 +37,7 @@ async def test_get_disbursement_envelope_status_success(
         return_value=DisbursementEnvelopeBatchStatusPayload(
             disbursement_envelope_id="env123",
             number_of_disbursements_received=100,
-            total_disbursement_amount_received=5000,
+            total_disbursement_quantity_received=5000,
             funds_available_with_bank="FUNDS_AVAILABLE",
             funds_available_latest_timestamp=datetime.now(),
             funds_available_latest_error_code=None,
@@ -65,7 +65,7 @@ async def test_get_disbursement_envelope_status_success(
         message=DisbursementEnvelopeBatchStatusPayload(
             disbursement_envelope_id="env123",
             number_of_disbursements_received=100,
-            total_disbursement_amount_received=5000,
+            total_disbursement_quantity_received=5000,
             funds_available_with_bank="FUNDS_AVAILABLE",
             funds_available_latest_timestamp=datetime.now(),
             funds_available_latest_error_code=None,
