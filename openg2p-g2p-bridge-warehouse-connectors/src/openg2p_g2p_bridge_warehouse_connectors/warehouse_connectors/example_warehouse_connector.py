@@ -1,7 +1,9 @@
 import logging
 
-from ..warehouse_interface.warehouse_connector_interface import WarehouseConnectorInterface
 from ..config import Settings
+from ..warehouse_interface.warehouse_connector_interface import (
+    WarehouseConnectorInterface,
+)
 
 _config = Settings.get_config()
 _logger = logging.getLogger(_config.logging_default_logger_name)

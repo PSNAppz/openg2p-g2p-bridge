@@ -1,2 +1,2 @@
-from .warehouse_connector_factory import WarehouseConnectorFactory
 from .example_warehouse_connector import ExampleWarehouseConnector
+from .warehouse_connector_factory import WarehouseConnectorFactory

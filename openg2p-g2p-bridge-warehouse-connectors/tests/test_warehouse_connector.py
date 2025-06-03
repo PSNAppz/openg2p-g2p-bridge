@@ -1,6 +1,6 @@
 from openg2p_g2p_bridge_warehouse_connectors.warehouse_connectors import (
-    WarehouseConnectorFactory,
     ExampleWarehouseConnector,
+    WarehouseConnectorFactory,
 )
 
 
