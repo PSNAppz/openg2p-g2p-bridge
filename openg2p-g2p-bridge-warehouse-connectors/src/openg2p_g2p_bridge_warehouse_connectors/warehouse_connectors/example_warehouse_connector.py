@@ -10,13 +10,11 @@ _logger = logging.getLogger(_config.logging_default_logger_name)
 
 
 class ExampleWarehouseConnector(WarehouseConnectorInterface):
-    def get_warehouse_resolution_details(
-        self, warehouses: list[str], benefit_code: str
-    ):
+    def allocate_warehouse(self, warehouses: list[str]):
+        """Allocate and return a list of warehouses."""
         _logger.info(
-            "Retrieving warehouse resolution details for %s with benefit %s",
+            "Retrieving warehouse resolution details for %s",
             warehouses,
-            benefit_code,
         )
         # In a real connector this would look up the warehouse info from an external system
         return {"warehouse_code": warehouses[0], "name": "Example Warehouse"}

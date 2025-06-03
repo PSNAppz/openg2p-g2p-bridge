@@ -11,5 +11,5 @@ def test_factory_returns_example_connector():
 
 def test_example_agency_connector():
     connector = ExampleAgencyConnector()
-    details = connector.get_agency_resolution_details(["EXAMPLE"], "BEN001")
+    details = connector.allocate_agency(["EXAMPLE"])
     assert details == {"agency_code": "EXAMPLE", "name": "Example Agency"}

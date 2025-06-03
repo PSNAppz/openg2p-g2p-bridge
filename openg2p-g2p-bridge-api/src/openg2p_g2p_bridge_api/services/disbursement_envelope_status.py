@@ -68,7 +68,6 @@ class DisbursementEnvelopeStatusService(BaseService):
                     funds_blocked_latest_error_code=disbursement_envelope_batch_status.funds_blocked_latest_error_code,
                     funds_blocked_attempts=disbursement_envelope_batch_status.funds_blocked_attempts,
                     funds_blocked_reference_number=disbursement_envelope_batch_status.funds_blocked_reference_number,
-                    id_mapper_resolution_required=disbursement_envelope_batch_status.id_mapper_resolution_required,
                     number_of_disbursements_shipped=disbursement_envelope_batch_status.number_of_disbursements_shipped,
                     number_of_disbursements_reconciled=disbursement_envelope_batch_status.number_of_disbursements_reconciled,
                     number_of_disbursements_reversed=disbursement_envelope_batch_status.number_of_disbursements_reversed,

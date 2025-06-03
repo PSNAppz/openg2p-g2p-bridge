@@ -91,7 +91,6 @@ class BenefitProgramConfigurationService(BaseService):
             sponsor_bank_account_number=benefit_program_configuration_payload.sponsor_bank_account_number,
             sponsor_bank_branch_code=benefit_program_configuration_payload.sponsor_bank_branch_code,
             sponsor_bank_account_currency=benefit_program_configuration_payload.sponsor_bank_account_currency,
-            id_mapper_resolution_required=benefit_program_configuration_payload.id_mapper_resolution_required,
             active=True,
         )
         _logger.info(

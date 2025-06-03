@@ -13,7 +13,6 @@ class BenefitProgramConfigurationPayload(BaseModel):
     sponsor_bank_account_number: Optional[str] = None
     sponsor_bank_branch_code: Optional[str] = None
     sponsor_bank_account_currency: Optional[str] = None
-    id_mapper_resolution_required: Optional[bool] = True
 
 
 class BenefitProgramConfigurationRequest(Request):

@@ -387,7 +387,6 @@ class DisbursementEnvelopeService(BaseService):
             funds_blocked_attempts=0,
             funds_blocked_latest_error_code="",
             active=True,
-            id_mapper_resolution_required=benefit_program_configuration.id_mapper_resolution_required,
         )
         _logger.info("Disbursement envelope batch status constructed successfully")
         return disbursement_envelope_batch_status

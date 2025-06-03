@@ -84,20 +84,6 @@ class DisbursementService(BaseService):
             session.add_all(disbursement_batch_controls)
             session.add(disbursement_envelope_batch_status)
 
-            if disbursement_envelope_batch_status.id_mapper_resolution_required:
-                mapper_resolution_batch_status: MapperResolutionBatchStatus = (
-                    MapperResolutionBatchStatus(
-                        mapper_resolution_batch_id=disbursement_batch_controls[
-                            0
-                        ].mapper_resolution_batch_id,
-                        resolution_status=ProcessStatus.PENDING,
-                        latest_error_code="",
-                        active=True,
-                    )
-                )
-                session.add(mapper_resolution_batch_status)
-                _logger.info("ID Mapper Resolution Batch Status Created!")
-
             bank_disbursement_batch_status: BankDisbursementBatchStatus = (
                 BankDisbursementBatchStatus(
                     bank_disbursement_batch_id=disbursement_batch_controls[

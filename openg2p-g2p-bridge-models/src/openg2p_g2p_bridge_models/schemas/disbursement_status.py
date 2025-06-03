@@ -84,7 +84,6 @@ class DisbursementEnvelopeBatchStatusPayload(BaseModel):
     funds_blocked_attempts: int
     funds_blocked_reference_number: Optional[str] = None
 
-    id_mapper_resolution_required: Optional[bool] = None
     number_of_disbursements_shipped: int
     number_of_disbursements_reconciled: int
     number_of_disbursements_reversed: int

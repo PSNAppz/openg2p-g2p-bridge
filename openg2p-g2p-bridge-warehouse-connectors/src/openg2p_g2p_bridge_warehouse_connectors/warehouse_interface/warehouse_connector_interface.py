@@ -2,8 +2,8 @@ from openg2p_fastapi_common.service import BaseService
 
 
 class WarehouseConnectorInterface(BaseService):
-    def get_warehouse_resolution_details(
-        self, warehouses: list[str], benefit_code: str
+    def allocate_warehouse(
+        self, warehouses: list[str]
     ):
-        """Return warehouse resolution details for the given code."""
+        """Allocate and return a list of warehouses."""
         raise NotImplementedError()
