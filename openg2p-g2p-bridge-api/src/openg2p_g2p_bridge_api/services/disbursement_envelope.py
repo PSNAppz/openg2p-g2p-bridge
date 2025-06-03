@@ -296,12 +296,20 @@ class DisbursementEnvelopeService(BaseService):
                 G2PBridgeErrorCodes.INVALID_NO_OF_DISBURSEMENTS
             )
         if (
-            disbursement_envelope_payload.total_disbursement_amount is None
-            or disbursement_envelope_payload.total_disbursement_amount < 0
+            disbursement_envelope_payload.total_disbursement_quantity is None
+            or disbursement_envelope_payload.total_disbursement_quantity < 0
         ):
-            _logger.error("Invalid total disbursement amount")
+            _logger.error("Invalid total disbursement quantity")
             raise DisbursementEnvelopeException(
-                G2PBridgeErrorCodes.INVALID_TOTAL_DISBURSEMENT_AMOUNT
+                G2PBridgeErrorCodes.INVALID_TOTAL_DISBURSEMENT_QUANTITY
+            )
+        if (
+            disbursement_envelope_payload.measurement_unit is None
+            or disbursement_envelope_payload.measurement_unit == ""
+        ):
+            _logger.error("Invalid measurement unit")
+            raise DisbursementEnvelopeException(
+                G2PBridgeErrorCodes.INVALID_BENEFIT_CODE 
             )
         if (
             disbursement_envelope_payload.disbursement_schedule_date is None
@@ -328,7 +336,8 @@ class DisbursementEnvelopeService(BaseService):
             cycle_code_mnemonic=disbursement_envelope_payload.cycle_code_mnemonic,
             number_of_beneficiaries=disbursement_envelope_payload.number_of_beneficiaries,
             number_of_disbursements=disbursement_envelope_payload.number_of_disbursements,
-            total_disbursement_amount=disbursement_envelope_payload.total_disbursement_amount,
+            total_disbursement_quantity=disbursement_envelope_payload.total_disbursement_quantity,
+            measurement_unit=disbursement_envelope_payload.measurement_unit,
             disbursement_currency_code=disbursement_envelope_payload.disbursement_currency_code,
             disbursement_schedule_date=disbursement_envelope_payload.disbursement_schedule_date,
             receipt_time_stamp=datetime.now(),
@@ -368,7 +377,7 @@ class DisbursementEnvelopeService(BaseService):
         disbursement_envelope_batch_status: DisbursementEnvelopeBatchStatus = DisbursementEnvelopeBatchStatus(
             disbursement_envelope_id=disbursement_envelope.disbursement_envelope_id,
             number_of_disbursements_received=0,
-            total_disbursement_amount_received=0,
+            total_disbursement_quantity_received=0,
             funds_available_with_bank=FundsAvailableWithBankEnum.PENDING_CHECK.value,
             funds_available_latest_timestamp=datetime.now(),
             funds_available_latest_error_code="",
@@ -378,7 +387,6 @@ class DisbursementEnvelopeService(BaseService):
             funds_blocked_attempts=0,
             funds_blocked_latest_error_code="",
             active=True,
-            id_mapper_resolution_required=benefit_program_configuration.id_mapper_resolution_required,
         )
         _logger.info("Disbursement envelope batch status constructed successfully")
         return disbursement_envelope_batch_status
@@ -415,12 +423,20 @@ class DisbursementEnvelopeService(BaseService):
                 G2PBridgeErrorCodes.INVALID_NO_OF_DISBURSEMENTS
             )
         if (
-            disbursement_envelope_payload.total_disbursement_amount is None
-            or disbursement_envelope_payload.total_disbursement_amount < 0
+            disbursement_envelope_payload.total_disbursement_quantity is None
+            or disbursement_envelope_payload.total_disbursement_quantity < 0
         ):
-            _logger.error("Invalid total disbursement amount")
+            _logger.error("Invalid total disbursement quantity")
             raise DisbursementEnvelopeException(
-                G2PBridgeErrorCodes.INVALID_TOTAL_DISBURSEMENT_AMOUNT
+                G2PBridgeErrorCodes.INVALID_TOTAL_DISBURSEMENT_QUANTITY
+            )
+        if (
+            disbursement_envelope_payload.measurement_unit is None
+            or disbursement_envelope_payload.measurement_unit == ""
+        ):
+            _logger.error("Invalid measurement unit")
+            raise DisbursementEnvelopeException(
+                G2PBridgeErrorCodes.INVALID_BENEFIT_CODE  # Consider a new error code
             )
         if (
             disbursement_envelope_payload.disbursement_schedule_date is None
@@ -451,8 +467,11 @@ class DisbursementEnvelopeService(BaseService):
         disbursement_envelope.number_of_disbursements = (
             disbursement_envelope_payload.number_of_disbursements
         )
-        disbursement_envelope.total_disbursement_amount = (
-            disbursement_envelope_payload.total_disbursement_amount
+        disbursement_envelope.total_disbursement_quantity = (
+            disbursement_envelope_payload.total_disbursement_quantity
+        )
+        disbursement_envelope.measurement_unit = (
+            disbursement_envelope_payload.measurement_unit
         )
         disbursement_envelope.disbursement_schedule_date = (
             disbursement_envelope_payload.disbursement_schedule_date

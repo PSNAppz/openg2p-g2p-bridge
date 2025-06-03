@@ -8,7 +8,13 @@ _logger = logging.getLogger(_config.logging_default_logger_name)
 
 
 class ExampleAgencyConnector(AgencyConnectorInterface):
-    def allocate_agency(self, agencies: list[str]):
-        _logger.info("Allocating agency for %s", agencies)
-        # In a real connector this would allocate the agency using an external system
+    def allocate_agency(
+        self, agencies: list[str]
+    ):
+        """Allocate and return a list of agencies."""
+        _logger.info(
+            "Retrieving agency resolution details for %s",
+            agencies,
+        )
+        # In a real connector this would look up the agency info from an external system
         return {"agency_code": agencies[0], "name": "Example Agency"}

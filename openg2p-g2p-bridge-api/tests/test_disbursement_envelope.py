@@ -32,7 +32,8 @@ def mock_create_disbursement_envelope(is_valid, error_code=None):
         cycle_code_mnemonic="CYCLE42",
         number_of_beneficiaries=100,
         number_of_disbursements=100,
-        total_disbursement_amount=5000.00,
+        total_disbursement_quantity=5000.00,
+        measurement_unit="units",
         disbursement_schedule_date=datetime.date(datetime.now()),
     )
     disbursement_envelope_response = DisbursementEnvelopeResponse(
@@ -61,7 +62,8 @@ def mock_create_disbursement_envelopes(is_valid, error_code=None):
             cycle_code_mnemonic="CYCLE42",
             number_of_beneficiaries=100,
             number_of_disbursements=100,
-            total_disbursement_amount=5000.00,
+            total_disbursement_quantity=5000.00,
+            measurement_unit="units",
             disbursement_schedule_date=datetime.date(datetime.now()),
         )
     ]
@@ -110,7 +112,8 @@ async def test_create_disbursement_envelope_success(
         cycle_code_mnemonic="CYCLE42",
         number_of_beneficiaries=100,
         number_of_disbursements=100,
-        total_disbursement_amount=5000.00,
+        total_disbursement_quantity=5000.00,
+        measurement_unit="units",
         disbursement_schedule_date=datetime.date(datetime.now()),
     )
 
@@ -177,7 +180,8 @@ async def test_create_disbursement_envelope_errors(
         cycle_code_mnemonic="CYCLE42",
         number_of_beneficiaries=100,
         number_of_disbursements=100,
-        total_disbursement_amount=5000.00,
+        total_disbursement_quantity=5000.00,
+        measurement_unit="units",
         disbursement_schedule_date=datetime.date(datetime.now()),
     )
 
@@ -306,7 +310,8 @@ def mock_cancel_disbursement_envelope(is_valid, error_code=None):
         cycle_code_mnemonic="CYCLE42",
         number_of_beneficiaries=100,
         number_of_disbursements=100,
-        total_disbursement_amount=5000.00,
+        total_disbursement_quantity=5000.00,
+        measurement_unit="units",
         disbursement_schedule_date=datetime.date(datetime.now()),
     )
     disbursement_envelope_response = DisbursementEnvelopeResponse(
@@ -448,7 +453,8 @@ def mock_amend_disbursement_envelope(is_valid, error_code=None):
         cycle_code_mnemonic="CYCLE42",
         number_of_beneficiaries=100,
         number_of_disbursements=100,
-        total_disbursement_amount=5000.00,
+        total_disbursement_quantity=5000.00,
+        measurement_unit="units",
         disbursement_schedule_date=datetime.date(datetime.now()),
     )
     disbursement_envelope_response = DisbursementEnvelopeResponse(
@@ -497,7 +503,8 @@ async def test_amend_disbursement_envelope_success(
         cycle_code_mnemonic="CYCLE42",
         number_of_beneficiaries=100,
         number_of_disbursements=100,
-        total_disbursement_amount=5000.00,
+        total_disbursement_quantity=5000.00,
+        measurement_unit="units",
         disbursement_schedule_date=datetime.date(datetime.now()),
     )
 

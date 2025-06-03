@@ -29,7 +29,7 @@ class MockSession:
             disbursement_envelope_id="test_envelope_id",
             benefit_program_mnemonic="test_program",
             cycle_code_mnemonic="test_cycle",
-            total_disbursement_amount=1000,
+            total_disbursement_quantity=1000,
         )
         self.disbursement_envelope_batch_status = DisbursementEnvelopeBatchStatus(
             disbursement_envelope_id="test_envelope_id",
@@ -52,7 +52,7 @@ class MockSession:
             disbursement_id="test_disbursement_id",
             beneficiary_id="test_beneficiary",
             beneficiary_name="Test Beneficiary",
-            disbursement_amount=100,
+            disbursement_quantity=100,
             narrative="Test payment",
         )
         self.disbursement_batch_control = DisbursementBatchControl(

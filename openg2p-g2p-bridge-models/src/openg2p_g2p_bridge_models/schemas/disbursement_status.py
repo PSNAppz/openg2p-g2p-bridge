@@ -71,7 +71,7 @@ class DisbursementEnvelopeStatusRequest(Request):
 class DisbursementEnvelopeBatchStatusPayload(BaseModel):
     disbursement_envelope_id: str
     number_of_disbursements_received: int
-    total_disbursement_amount_received: int
+    total_disbursement_quantity_received: int
 
     funds_available_with_bank: FundsAvailableWithBankEnum
     funds_available_latest_timestamp: Optional[datetime.datetime] = None
@@ -84,7 +84,6 @@ class DisbursementEnvelopeBatchStatusPayload(BaseModel):
     funds_blocked_attempts: int
     funds_blocked_reference_number: Optional[str] = None
 
-    id_mapper_resolution_required: Optional[bool] = None
     number_of_disbursements_shipped: int
     number_of_disbursements_reconciled: int
     number_of_disbursements_reversed: int

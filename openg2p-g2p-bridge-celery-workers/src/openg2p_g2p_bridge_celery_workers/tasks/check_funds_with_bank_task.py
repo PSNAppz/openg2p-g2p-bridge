@@ -65,7 +65,7 @@ def check_funds_with_bank_worker(disbursement_envelope_id: str):
             .first()
         )
 
-        total_funds_needed = envelope.total_disbursement_amount
+        total_funds_needed = envelope.total_disbursement_quantity
         bank_connector = BankConnectorFactory.get_component().get_bank_connector(
             benefit_program_configuration.sponsor_bank_code
         )

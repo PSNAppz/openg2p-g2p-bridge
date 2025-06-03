@@ -130,7 +130,7 @@ def disburse_funds_from_bank_worker(bank_disbursement_batch_id: str):
                     disbursement_id=disbursement.disbursement_id,
                     remitting_account=benefit_program_configuration.sponsor_bank_account_number,
                     remitting_account_currency=benefit_program_configuration.sponsor_bank_account_currency,
-                    payment_amount=disbursement.disbursement_amount,
+                    payment_amount=disbursement.disbursement_quantity,
                     funds_blocked_reference_number=envelope_batch_status.funds_blocked_reference_number,
                     beneficiary_account=mapper_details.bank_account_number
                     if mapper_details

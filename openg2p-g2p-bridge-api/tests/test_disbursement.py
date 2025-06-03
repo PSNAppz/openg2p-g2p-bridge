@@ -41,7 +41,7 @@ async def test_create_disbursements_success(
         DisbursementPayload(
             disbursement_envelope_id="env123",
             beneficiary_id="123AB",
-            disbursement_amount=1000,
+            disbursement_quantity=1000,
         )
     ]
     disbursement_request = DisbursementRequest(
@@ -99,7 +99,7 @@ async def test_create_disbursements_failure(
         DisbursementPayload(
             disbursement_envelope_id="env123",
             beneficiary_id="123AB",
-            disbursement_amount=1000,
+            disbursement_quantity=1000,
         )
     ]
     disbursement_request = DisbursementRequest(
@@ -172,7 +172,7 @@ async def test_cancel_disbursements_success(
         DisbursementPayload(
             disbursement_id="123",
             beneficiary_id="123AB",
-            disbursement_amount=1000,
+            disbursement_quantity=1000,
             cancellation_status=None,
         )
     ]
@@ -235,7 +235,7 @@ async def test_cancel_disbursements_failure(
         DisbursementPayload(
             disbursement_id="123",
             beneficiary_id="123AB",
-            disbursement_amount=1000,
+            disbursement_quantity=1000,
             cancellation_status=None,
         )
     ]

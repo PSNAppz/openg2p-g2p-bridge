@@ -19,7 +19,7 @@ class MockSession:
         self.disbursement_envelope = DisbursementEnvelope(
             disbursement_envelope_id="test_envelope_id",
             benefit_program_mnemonic="test_program",
-            total_disbursement_amount=1000,
+            total_disbursement_quantity=1000,
         )
         self.disbursement_envelope_batch_status = DisbursementEnvelopeBatchStatus(
             disbursement_envelope_id="test_envelope_id",

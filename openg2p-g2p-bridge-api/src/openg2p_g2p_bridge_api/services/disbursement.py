@@ -84,20 +84,6 @@ class DisbursementService(BaseService):
             session.add_all(disbursement_batch_controls)
             session.add(disbursement_envelope_batch_status)
 
-            if disbursement_envelope_batch_status.id_mapper_resolution_required:
-                mapper_resolution_batch_status: MapperResolutionBatchStatus = (
-                    MapperResolutionBatchStatus(
-                        mapper_resolution_batch_id=disbursement_batch_controls[
-                            0
-                        ].mapper_resolution_batch_id,
-                        resolution_status=ProcessStatus.PENDING,
-                        latest_error_code="",
-                        active=True,
-                    )
-                )
-                session.add(mapper_resolution_batch_status)
-                _logger.info("ID Mapper Resolution Batch Status Created!")
-
             bank_disbursement_batch_status: BankDisbursementBatchStatus = (
                 BankDisbursementBatchStatus(
                     bank_disbursement_batch_id=disbursement_batch_controls[
@@ -155,8 +141,8 @@ class DisbursementService(BaseService):
         disbursement_envelope_batch_status.number_of_disbursements_received += len(
             disbursements
         )
-        disbursement_envelope_batch_status.total_disbursement_amount_received += sum(
-            d.disbursement_amount for d in disbursements
+        disbursement_envelope_batch_status.total_disbursement_quantity_received += sum(
+            d.disbursement_quantity for d in disbursements
         )
         _logger.info("Disbursement Envelope Batch Status Updated!")
         return disbursement_envelope_batch_status
@@ -176,7 +162,7 @@ class DisbursementService(BaseService):
                 mis_reference_number=disbursement_payload.mis_reference_number,
                 beneficiary_id=disbursement_payload.beneficiary_id,
                 beneficiary_name=disbursement_payload.beneficiary_name,
-                disbursement_amount=disbursement_payload.disbursement_amount,
+                disbursement_quantity=disbursement_payload.disbursement_quantity,
                 narrative=disbursement_payload.narrative,
                 active=True,
             )
@@ -218,7 +204,7 @@ class DisbursementService(BaseService):
                 disbursement_payload.response_error_codes.append(
                     G2PBridgeErrorCodes.INVALID_DISBURSEMENT_ENVELOPE_ID
                 )
-            if disbursement_payload.disbursement_amount <= 0:
+            if disbursement_payload.disbursement_quantity <= 0:
                 disbursement_payload.response_error_codes.append(
                     G2PBridgeErrorCodes.INVALID_DISBURSEMENT_AMOUNT
                 )
@@ -305,14 +291,14 @@ class DisbursementService(BaseService):
             len(disbursement_payloads)
             + disbursement_envelope_batch_status.number_of_disbursements_received
         )
-        total_disbursement_amount_after_this_request = (
+        total_disbursement_quantity_after_this_request = (
             sum(
                 [
-                    disbursement_payload.disbursement_amount
+                    disbursement_payload.disbursement_quantity
                     for disbursement_payload in disbursement_payloads
                 ]
             )
-            + disbursement_envelope_batch_status.total_disbursement_amount_received
+            + disbursement_envelope_batch_status.total_disbursement_quantity_received
         )
 
         if (
@@ -326,11 +312,11 @@ class DisbursementService(BaseService):
             )
 
         if (
-            total_disbursement_amount_after_this_request
-            > disbursement_envelope.total_disbursement_amount
+            total_disbursement_quantity_after_this_request
+            > disbursement_envelope.total_disbursement_quantity
         ):
             raise DisbursementException(
-                G2PBridgeErrorCodes.TOTAL_DISBURSEMENT_AMOUNT_EXCEEDS_DECLARED,
+                G2PBridgeErrorCodes.TOTAL_DISBURSEMENT_QUANTITY_EXCEEDS_DECLARED,
                 disbursement_payloads,
             )
         _logger.info("Disbursement Envelope Validated!")
@@ -455,13 +441,8 @@ class DisbursementService(BaseService):
             disbursement_envelope_batch_status.number_of_disbursements_received -= len(
                 disbursements_in_db
             )
-            disbursement_envelope_batch_status.total_disbursement_amount_received -= (
-                sum(
-                    [
-                        disbursement.disbursement_amount
-                        for disbursement in disbursements_in_db
-                    ]
-                )
+            disbursement_envelope_batch_status.total_disbursement_quantity_received -= (
+                sum(d.disbursement_quantity for d in disbursements_in_db)
             )
 
             session.add_all(disbursements_in_db)
@@ -612,7 +593,7 @@ class DisbursementService(BaseService):
                 disbursement_payloads,
             )
 
-        # we don’t need a lock for this read
+        # we don't need a lock for this read
         batch_status = (
             (
                 await session.execute(
@@ -629,8 +610,8 @@ class DisbursementService(BaseService):
         no_of_after = batch_status.number_of_disbursements_received - len(
             disbursements_in_db
         )
-        total_amt_after = batch_status.total_disbursement_amount_received - sum(
-            d.disbursement_amount for d in disbursements_in_db
+        total_qty_after = batch_status.total_disbursement_quantity_received - sum(
+            d.disbursement_quantity for d in disbursements_in_db
         )
 
         if no_of_after < 0:
@@ -640,10 +621,10 @@ class DisbursementService(BaseService):
                 disbursement_payloads,
             )
 
-        if total_amt_after < 0:
-            _logger.error("Total Disbursement Amount Less Than Zero!")
+        if total_qty_after < 0:
+            _logger.error("Total Disbursement Quantity Less Than Zero!")
             raise DisbursementException(
-                G2PBridgeErrorCodes.TOTAL_DISBURSEMENT_AMOUNT_LESS_THAN_ZERO,
+                G2PBridgeErrorCodes.TOTAL_DISBURSEMENT_QUANTITY_LESS_THAN_ZERO,
                 disbursement_payloads,
             )
 
