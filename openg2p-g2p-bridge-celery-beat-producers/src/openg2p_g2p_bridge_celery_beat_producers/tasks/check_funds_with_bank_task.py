@@ -66,6 +66,7 @@ def check_funds_with_bank_beat_producer():
             .scalars()
             .all()
         )
+        _logger.info(f"Found {len(envelopes)} envelopes to check funds with bank")
 
         for envelope in envelopes:
             _logger.info(

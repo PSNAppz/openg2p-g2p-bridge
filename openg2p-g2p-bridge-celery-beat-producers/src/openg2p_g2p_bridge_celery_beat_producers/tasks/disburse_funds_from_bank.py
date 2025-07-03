@@ -70,6 +70,10 @@ def disburse_funds_from_bank_beat_producer():
             .scalars()
             .all()
         )
+        _logger.info(
+            f"Found {len(envelopes)} envelopes with funds blocked successfully and ready for disbursement"
+        )
+        # Check for pending batches for each envelope
         for envelope in envelopes:
             pending_batches = (
                 session.execute(

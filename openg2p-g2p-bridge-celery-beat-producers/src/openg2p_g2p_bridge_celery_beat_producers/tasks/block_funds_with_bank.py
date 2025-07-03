@@ -69,6 +69,7 @@ def block_funds_with_bank_beat_producer():
             .scalars()
             .all()
         )
+        _logger.info(f"Found {len(envelopes)} envelopes to block funds with bank")
 
         for envelope in envelopes:
             _logger.info(
