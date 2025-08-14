@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from openg2p_fastapi_common.models import BaseORMModelWithTimes
 from sqlalchemy import Boolean, DateTime, Integer, String, Text
@@ -17,7 +17,9 @@ class AccountStatement(BaseORMModelWithTimes):
     reference_number: Mapped[str] = mapped_column(String, nullable=True)
     statement_number: Mapped[str] = mapped_column(String, nullable=True)
     sequence_number: Mapped[str] = mapped_column(String, nullable=True)
-    statement_upload_timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    statement_upload_timestamp: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(tz=timezone.utc).replace(tzinfo=None)
+    )
     statement_process_status: Mapped[ProcessStatus] = mapped_column(
         SqlEnum(ProcessStatus), default=ProcessStatus.PENDING
     )

@@ -1,5 +1,4 @@
 import logging
-from functools import cached_property
 from typing import Annotated
 
 from fastapi import Depends
@@ -26,6 +25,11 @@ _logger = logging.getLogger(_config.logging_default_logger_name)
 
 
 class DisbursementEnvelopeController(BaseController):
+    disbursement_envelope_service: DisbursementEnvelopeService = (
+        DisbursementEnvelopeService.get_cached_component()
+    )
+    request_validation: RequestValidation = RequestValidation.get_cached_component()
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -49,14 +53,6 @@ class DisbursementEnvelopeController(BaseController):
             responses={200: {"model": DisbursementEnvelopeResponse}},
             methods=["POST"],
         )
-
-    @cached_property
-    def disbursement_envelope_service(self) -> DisbursementEnvelopeService:
-        return DisbursementEnvelopeService.get_component()
-
-    @cached_property
-    def request_validation(self) -> RequestValidation:
-        return RequestValidation.get_component()
 
     async def create_disbursement_envelope(
         self,

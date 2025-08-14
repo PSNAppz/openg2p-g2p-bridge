@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 
 from openg2p_fastapi_common.models import BaseORMModelWithTimes
@@ -29,7 +29,9 @@ class Disbursement(BaseORMModelWithTimes):
     beneficiary_name: Mapped[str] = mapped_column(String)
     disbursement_amount: Mapped[float] = mapped_column(Float)
     narrative: Mapped[str] = mapped_column(String)
-    receipt_time_stamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    receipt_time_stamp: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(tz=timezone.utc).replace(tzinfo=None)
+    )
     cancellation_status: Mapped[DisbursementCancellationStatus] = mapped_column(
         SqlEnum(DisbursementCancellationStatus),
         default=DisbursementCancellationStatus.NOT_CANCELLED,

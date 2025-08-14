@@ -115,12 +115,12 @@ def disburse_funds_from_bank_worker(bank_disbursement_batch_id: str):
                     beneficiary_name=disbursement.beneficiary_name,
                     beneficiary_account_type=mapper_details.mapper_resolved_fa_type,
                     beneficiary_phone_no=mapper_details.mobile_number if mapper_details else None,
-                    beneficiary_mobile_wallet_provider=mapper_details.mobile_wallet_provider
-                    if mapper_details
-                    else None,
-                    beneficiary_email_wallet_provider=mapper_details.email_wallet_provider
-                    if mapper_details
-                    else None,
+                    beneficiary_mobile_wallet_provider=(
+                        mapper_details.mobile_wallet_provider if mapper_details else None
+                    ),
+                    beneficiary_email_wallet_provider=(
+                        mapper_details.email_wallet_provider if mapper_details else None
+                    ),
                     beneficiary_email=mapper_details.email_address if mapper_details else None,
                     disbursement_narrative=disbursement.narrative,
                     benefit_program_mnemonic=envelope.benefit_program_mnemonic,

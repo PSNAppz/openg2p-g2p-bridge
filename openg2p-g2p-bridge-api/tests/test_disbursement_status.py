@@ -143,6 +143,5 @@ async def test_get_disbursement_status_failure(
     assert actual_response.message == error_response.message
 
     # Assert overall response equality
-    assert (
-        actual_response == error_response
-    ), f"The response did not match the expected error response for {error_code}."
+    assert_err_res = f"The response did not match the expected error response for {error_code}."
+    assert actual_response == error_response, assert_err_res

@@ -68,9 +68,9 @@ class DisbursementService(BaseService):
             disbursements: List[Disbursement] = await self.construct_disbursements(
                 disbursement_payloads=disbursement_request.message
             )
-            disbursement_batch_controls: List[
-                DisbursementBatchControl
-            ] = await self.construct_disbursement_batch_controls(disbursements=disbursements)
+            disbursement_batch_controls = await self.construct_disbursement_batch_controls(
+                disbursements=disbursements
+            )
 
             # Lock the envelope batch status row for update (nowait)
             disbursement_envelope_batch_status = await self.update_disbursement_envelope_batch_status(

@@ -1,5 +1,4 @@
 import logging
-from functools import cached_property
 from typing import Annotated
 
 from fastapi import Depends, File, UploadFile
@@ -26,6 +25,9 @@ _logger = logging.getLogger(_config.logging_default_logger_name)
 
 
 class AccountStatementController(BaseController):
+    account_statement_service: AccountStatementService = AccountStatementService.get_cached_component()
+    request_validation: RequestValidation = RequestValidation.get_cached_component()
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -37,14 +39,6 @@ class AccountStatementController(BaseController):
             responses={200: {"model": AccountStatementResponse}},
             methods=["POST"],
         )
-
-    @cached_property
-    def account_statement_service(self) -> AccountStatementService:
-        return AccountStatementService.get_component()
-
-    @cached_property
-    def request_validation(self) -> RequestValidation:
-        return RequestValidation.get_component()
 
     async def upload_mt940(
         self,

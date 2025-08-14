@@ -184,8 +184,7 @@ def mt940_processor_worker(statement_id: str):
 
         except Exception as e:
             _logger.error(
-                f"Error processing account statement for statement id: {statement_id}"
-                f" with error: {str(e)}",
+                f"Error processing account statement for statement id: {statement_id} with error: {str(e)}",
             )
             account_statement.statement_process_status = ProcessStatus.PENDING
             account_statement.statement_process_error_code = str(e)

@@ -157,6 +157,5 @@ async def test_get_disbursement_envelope_status_failure(
     actual_response = await controller.get_disbursement_envelope_status(
         request_payload, is_signature_valid=True
     )
-    assert (
-        actual_response == error_response
-    ), f"The response did not match the expected error response for {error_code}."
+    assert_error_res = f"The response did not match the expected error response for {error_code}."
+    assert actual_response == error_response, assert_error_res

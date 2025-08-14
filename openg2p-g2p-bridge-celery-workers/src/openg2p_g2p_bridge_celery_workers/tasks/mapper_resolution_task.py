@@ -119,9 +119,11 @@ def process_and_store_resolution(
                     disbursement_id=disbursement_id,
                     beneficiary_id=single_response.id,
                     mapper_resolved_fa=single_response.fa,
-                    mapper_resolved_name=single_response.account_provider_info.name
-                    if single_response.account_provider_info
-                    else None,
+                    mapper_resolved_name=(
+                        single_response.account_provider_info.name
+                        if single_response.account_provider_info
+                        else None
+                    ),
                     mapper_resolved_fa_type=deconstructed_fa.get("fa_type"),
                     bank_account_number=deconstructed_fa.get("account_number"),
                     bank_code=deconstructed_fa.get("bank_code"),

@@ -22,8 +22,25 @@ class Settings(BankConnectorSettings, BaseSettings):
     celery_broker_url: str = "redis://localhost:6379/0"
     celery_backend_url: str = "redis://localhost:6379/0"
 
-    bank_fa_deconstruct_strategy: str = r"^account_number:(?P<account_number>.*)\.branch_code:(?P<branch_code>.*)\.bank_code:(?P<bank_code>.*)\.mobile_number:(?P<mobile_number>.*)\.email_address:(?P<email_address>.*)\.fa_type:(?P<fa_type>.*)$"
-    mobile_wallet_deconstruct_strategy: str = r"^mobile_number:(?P<mobile_number>.*)\.wallet_provider_name:(?P<wallet_provider_name>.*)\.wallet_provider_code:(?P<wallet_provider_code>.*)\.fa_type:(?P<fa_type>.*)$"
-    email_wallet_deconstruct_strategy: str = r"^email_address:(?P<email_address>.*)\.wallet_provider_name:(?P<wallet_provider_name>.*)\.wallet_provider_code:(?P<wallet_provider_code>.*)\.fa_type:(?P<fa_type>.*)$"
+    bank_fa_deconstruct_strategy: str = (
+        r"^account_number:(?P<account_number>.*)"
+        r"\.branch_code:(?P<branch_code>.*)"
+        r"\.bank_code:(?P<bank_code>.*)"
+        r"\.mobile_number:(?P<mobile_number>.*)"
+        r"\.email_address:(?P<email_address>.*)"
+        r"\.fa_type:(?P<fa_type>.*)$"
+    )
+    mobile_wallet_deconstruct_strategy: str = (
+        r"^mobile_number:(?P<mobile_number>.*)"
+        r"\.wallet_provider_name:(?P<wallet_provider_name>.*)"
+        r"\.wallet_provider_code:(?P<wallet_provider_code>.*)"
+        r"\.fa_type:(?P<fa_type>.*)$"
+    )
+    email_wallet_deconstruct_strategy: str = (
+        r"^email_address:(?P<email_address>.*)"
+        r"\.wallet_provider_name:(?P<wallet_provider_name>.*)"
+        r"\.wallet_provider_code:(?P<wallet_provider_code>.*)"
+        r"\.fa_type:(?P<fa_type>.*)$"
+    )
 
     mapper_request_sender_id: str = "openg2p-g2p-bridge"

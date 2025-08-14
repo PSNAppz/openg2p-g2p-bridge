@@ -10,6 +10,10 @@ _config = Settings.get_config()
 
 
 class RequestValidation(BaseService):
+    def __init__(self, **kw):
+        super().__init__(**kw)
+        self.mime_detector = magic.Magic(mime=True)
+
     def validate_signature(self, is_signature_valid) -> None:
         if not is_signature_valid:
             raise RequestValidationException(
@@ -59,8 +63,7 @@ class RequestValidation(BaseService):
         # read a small chunk to detect the real MIME type
         sample = request.file.read(1024)
         request.file.seek(0)
-        detector = magic.Magic(mime=True)
-        real_mime = detector.from_buffer(sample)
+        real_mime = self.mime_detector.from_buffer(sample)
         if real_mime not in _config.supported_file_types:
             raise RequestValidationException(
                 code=SyncResponseStatusReasonCodeEnum.rjct_file_type_not_supported,

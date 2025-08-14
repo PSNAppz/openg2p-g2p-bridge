@@ -1,5 +1,4 @@
 import logging
-from functools import cached_property
 from typing import Annotated
 
 from fastapi import Depends
@@ -23,6 +22,11 @@ _logger = logging.getLogger(_config.logging_default_logger_name)
 
 
 class DisbursementEnvelopeStatusController(BaseController):
+    disbursement_envelope_status_service: DisbursementEnvelopeStatusService = (
+        DisbursementEnvelopeStatusService.get_cached_component()
+    )
+    request_validation: RequestValidation = RequestValidation.get_cached_component()
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -34,14 +38,6 @@ class DisbursementEnvelopeStatusController(BaseController):
             responses={200: {"model": DisbursementEnvelopeStatusResponse}},
             methods=["POST"],
         )
-
-    @cached_property
-    def disbursement_envelope_status_service(self) -> DisbursementEnvelopeStatusService:
-        return DisbursementEnvelopeStatusService.get_component()
-
-    @cached_property
-    def request_validation(self) -> RequestValidation:
-        return RequestValidation.get_component()
 
     async def get_disbursement_envelope_status(
         self,
@@ -57,7 +53,7 @@ class DisbursementEnvelopeStatusController(BaseController):
                     disbursement_envelope_status_request
                 )
             )
-            disbursement_status_response: DisbursementEnvelopeStatusResponse = await self.disbursement_envelope_status_service.construct_disbursement_envelope_status_success_response(
+            disbursement_status_response = await self.disbursement_envelope_status_service.construct_disbursement_envelope_status_success_response(
                 disbursement_envelope_status_request,
                 disbursement_envelope_batch_status_payload,
             )
@@ -65,7 +61,7 @@ class DisbursementEnvelopeStatusController(BaseController):
 
         except RequestValidationException as e:
             _logger.error("Error validating request")
-            error_response: DisbursementEnvelopeStatusResponse = await self.disbursement_envelope_status_service.construct_disbursement_envelope_status_error_response(
+            error_response = await self.disbursement_envelope_status_service.construct_disbursement_envelope_status_error_response(
                 disbursement_envelope_status_request,
                 e.code,
             )
@@ -73,7 +69,7 @@ class DisbursementEnvelopeStatusController(BaseController):
 
         except DisbursementStatusException as e:
             _logger.error(f"Error in getting disbursement envelope status: {e}")
-            error_response: DisbursementEnvelopeStatusResponse = await self.disbursement_envelope_status_service.construct_disbursement_envelope_status_error_response(
+            error_response = await self.disbursement_envelope_status_service.construct_disbursement_envelope_status_error_response(
                 disbursement_envelope_status_request,
                 e.code,
             )
