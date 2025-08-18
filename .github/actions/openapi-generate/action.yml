@@ -1,0 +1,24 @@
+name: OpenAPI JSON Generate Action
+description: ""
+runs:
+  using: composite
+  steps:
+  - name: Install app
+    shell: bash
+    run: |
+      python3 -m pip install git+https://github.com/openg2p/openg2p-fastapi-common@1.1\#subdirectory=openg2p-fastapi-common
+      python3 -m pip install git+https://github.com/openg2p/openg2p-g2pconnect-common-lib@1.1\#subdirectory=openg2p-g2pconnect-common-lib
+      python3 -m pip install -e ./openg2p-g2p-bridge-models
+      python3 -m pip install -e ./openg2p-g2p-bridge-api
+  - name: Generate openapi json
+    shell: bash
+    run: |
+      mkdir -p api-docs/generated
+      python3 openg2p-g2p-bridge-api/main.py getOpenAPI api-docs/generated/openapi.json
+      if ! [ -z "$(git status --porcelain=v1 2>/dev/null -- api-docs/generated/openapi.json)" ]; then
+        shopt -s nocasematch
+        if [[ ${{ github.repository_owner }} == 'OpenG2P' ]]; then
+          export OPENAPI_CHANGED="true"
+          echo OPENAPI_CHANGED=$OPENAPI_CHANGED >> $GITHUB_ENV
+        fi
+      fi

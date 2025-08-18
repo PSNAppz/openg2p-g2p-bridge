@@ -1,0 +1,54 @@
+name: Dockers Build and Push
+description: ""
+inputs:
+  NAMESPACE:
+    required: false
+    description: Docker Hub Namespace or Organization
+  SERVICE_NAME:
+    required: true
+    description: Docker Repository
+  TAG:
+    required: false
+    description: Docker Tag
+  DOCKERFILE_PATH:
+    required: true
+    description: Path to Dockerfile
+  DOCKER_HUB_TOKEN:
+    required: false
+    description: Docker Hub Token
+  DOCKER_HUB_ACTOR:
+    required: false
+    description: Docker Hub Actor
+
+runs:
+  using: composite
+  steps:
+  - name: Docker build
+    shell: bash
+    run: |
+      if [ -z '${{ inputs.TAG }}' ]; then
+        VERSION=$(echo ${{ github.ref }} | sed -e 's,.*/\(.*\),\1,')
+      else
+        VERSION='${{ inputs.TAG }}'
+      fi
+      VERSION=${VERSION#v}
+
+      IMAGE_ID=${{ inputs.NAMESPACE || 'openg2p' }}/${{ inputs.SERVICE_NAME }}
+      IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]') # Change all uppercase to lowercase
+
+      echo IMAGE_ID=$IMAGE_ID
+      echo VERSION=$VERSION
+      echo IMAGE_ID=$IMAGE_ID >> $GITHUB_ENV
+      echo VERSION=$VERSION >> $GITHUB_ENV
+
+      docker build . -f ${{ inputs.DOCKERFILE_PATH }} -t $IMAGE_ID:$VERSION
+      if [[ '${{ inputs.DOCKER_HUB_TOKEN }}' != '' && '${{ inputs.DOCKER_HUB_ACTOR }}' != '' ]]; then
+        export DOCKER_PUSH="true"
+        echo DOCKER_PUSH=$DOCKER_PUSH >> $GITHUB_ENV
+      fi
+  - name: Docker push
+    shell: bash
+    if: env.DOCKER_PUSH == 'true'
+    run: |
+      echo "${{ inputs.DOCKER_HUB_TOKEN }}" | docker login -u ${{ inputs.DOCKER_HUB_ACTOR }} --password-stdin
+      docker push ${{ env.IMAGE_ID }}:${{ env.VERSION }}
