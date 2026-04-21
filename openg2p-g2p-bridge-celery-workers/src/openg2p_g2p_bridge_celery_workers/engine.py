@@ -1,5 +1,6 @@
-from sqlalchemy import create_engine
 import logging
+
+from sqlalchemy import create_engine
 
 from .config import Settings
 
@@ -19,9 +20,7 @@ def construct_db_datasource(db_driver, db_username, db_password, db_hostname, db
         datasource += f":{db_port}"
     if db_dbname:
         datasource += f"/{db_dbname}"
-    _logger.debug(
-        "Constructed database datasource: %s", datasource
-    ) 
+    _logger.debug("Constructed database datasource: %s", datasource)
     return datasource
 
 

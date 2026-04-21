@@ -33,6 +33,7 @@ _logger = logging.getLogger("warehouse_notification_worker")
 
 @celery_app.task(name="warehouse_notification_worker")
 def warehouse_notification_worker(disbursement_batch_control_geo_id: str) -> None:
+    _logger.info(f"Starting warehouse notification for geo: {disbursement_batch_control_geo_id}")
     session_maker = sessionmaker(bind=_engine.get("db_engine_bridge"), expire_on_commit=False)
     with session_maker() as session:
         try:
@@ -132,6 +133,9 @@ def warehouse_notification_worker(disbursement_batch_control_geo_id: str) -> Non
             session.add(notification_log)
 
             session.commit()
+            _logger.info(
+                f"Warehouse notification completed successfully for geo: {disbursement_batch_control_geo_id}"
+            )
 
         except Exception as e:
             session.rollback()
@@ -155,6 +159,7 @@ def construct_warehouse_notification_payload(
     disbursement_envelope,
     disbursement_batch_control_geo_attributes,
 ):
+    _logger.info("Constructing warehouse notification payload")
     notification_payload = WarehouseNotificationPayload(
         program_mnemonic=getattr(disbursement_envelope, "benefit_program_mnemonic", None),
         program_description=getattr(disbursement_envelope, "benefit_program_description", None),
@@ -192,4 +197,5 @@ def construct_warehouse_notification_payload(
         ),
     )
 
+    _logger.info("Warehouse notification payload constructed successfully")
     return notification_payload

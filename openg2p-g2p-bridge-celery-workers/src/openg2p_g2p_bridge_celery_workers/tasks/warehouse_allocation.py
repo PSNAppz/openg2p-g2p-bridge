@@ -26,6 +26,7 @@ _config = Settings.get_config()
 
 @celery_app.task(name="warehouse_allocation_worker")
 def warehouse_allocation_worker(disbursement_batch_control_id: str) -> None:
+    _logger.info(f"Starting warehouse allocation for batch: {disbursement_batch_control_id}")
     session_maker = sessionmaker(bind=_engine.get("db_engine_bridge"), expire_on_commit=False)
     # Remove session_maker_pbms and pbms_session
     with session_maker() as session:
@@ -141,6 +142,9 @@ def warehouse_allocation_worker(disbursement_batch_control_id: str) -> None:
             disbursement_batch_control.warehouse_allocation_timestamp = datetime.now()
             disbursement_batch_control.agency_allocation_status = ProcessStatus.PENDING.value
             session.commit()
+            _logger.info(
+                f"Warehouse allocation completed successfully for batch: {disbursement_batch_control_id}"
+            )
         except Exception as e:
             session.rollback()
             _logger.error(f"Warehouse allocation failed: {e}")

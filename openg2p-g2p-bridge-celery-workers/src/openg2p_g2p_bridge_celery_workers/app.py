@@ -14,6 +14,9 @@ from openg2p_g2p_bridge_bank_connectors.app import (
     Initializer as BankConnectorInitializer,
 )
 from openg2p_g2p_bridge_geo_resolver.app import Initializer as GeoResolversInitializer
+from openg2p_g2p_bridge_mapper_connectors.app import (
+    Initializer as MapperConnectorInitializer,
+)
 from openg2p_g2p_bridge_notification_connectors.app import (
     Initializer as NotificationConnectorInitializer,
 )
@@ -36,6 +39,7 @@ class Initializer(BaseInitializer):
         AgencyAllocatorInitializer()
         WarehouseAllocatorInitializer()
         NotificationConnectorInitializer()
+        MapperConnectorInitializer()
         MapperInitializer()
         ResolveHelper()
         WarehouseHelper()

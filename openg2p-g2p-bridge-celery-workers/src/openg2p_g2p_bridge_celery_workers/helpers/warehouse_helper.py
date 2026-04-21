@@ -28,6 +28,9 @@ class WarehouseHelper(BaseService):
         Parses additional_info for BANK, BRANCH, ACCOUNT and returns a SponsorBankConfiguration model (fields set to None if missing).
         """
         pbms_session_maker = sessionmaker(bind=_engine.get("db_engine_pbms"), expire_on_commit=False)
+        _logger.info(
+            f"Retrieving sponsor bank configuration for program {benefit_program_id} and code {benefit_code_id}"
+        )
         with pbms_session_maker() as session:
             record = (
                 session.query(G2PWarehouseProgramBenefitCode)
@@ -48,7 +51,7 @@ class WarehouseHelper(BaseService):
                     sponsor_bank_code=None,
                 )
             info = record.additional_info
-
+            _logger.info(f"Found warehouse program benefit code: {info}")
             return SponsorBankConfiguration(
                 program_account_number=extract("ACCOUNT", info),
                 program_account_type=extract("TYPE", info),

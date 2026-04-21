@@ -8,8 +8,10 @@ from openg2p_g2p_bridge_models.models import (
     DisbursementResolutionFinancialAddress,
     ProcessStatus,
 )
-from openg2p_g2pconnect_mapper_lib.client import MapperResolveClient
-from openg2p_g2pconnect_mapper_lib.schemas import ResolveRequest
+from openg2p_g2p_bridge_mapper_connectors.schemas import ResolveRequest, ResolveResponse
+
+from openg2p_g2p_bridge_mapper_connectors.factory import MapperFactory
+
 from sqlalchemy import exists, select
 from sqlalchemy.orm import sessionmaker
 
@@ -63,7 +65,6 @@ def mapper_resolution_worker(disbursement_batch_control_id: str):
             )
 
             beneficiary_disbursement_map = {d.beneficiary_id: d.id for d in disbursements}
-            _logger.info(f"Sending resolve request to url {_config.mapper_resolve_api_url}")
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             try:
@@ -85,6 +86,9 @@ def mapper_resolution_worker(disbursement_batch_control_id: str):
                 beneficiary_disbursement_map,
                 session,
             )
+            _logger.info(
+                f"Mapper resolution completed successfully for batch: {disbursement_batch_control_id}"
+            )
 
         except Exception as e:
             disbursement_batch_control.fa_resolution_latest_error_code = str(e)
@@ -102,28 +106,14 @@ async def make_resolve_request(disbursements):
     _logger.info("Making resolve request")
     resolve_helper = ResolveHelper.get_component()
 
-    single_resolve_requests = [
-        resolve_helper.construct_single_resolve_request(d.beneficiary_id) for d in disbursements
-    ]
-    resolve_request: ResolveRequest = resolve_helper.construct_resolve_request(single_resolve_requests)
-    if _config.mapper_request_jwt_enabled:
-        jwt_token = await resolve_helper.create_jwt_token(resolve_request.model_dump(mode="json"))
-    else:
-        jwt_token = ""
+    beneficiary_ids = [d.beneficiary_id for d in disbursements]
+    resolve_request: ResolveRequest = resolve_helper.construct_resolve_request(beneficiary_ids)
 
-    headers = {"content-type": "application/json", "Signature": jwt_token}
-    _logger.info(f"JWT token created: {jwt_token}")
-    resolve_client = MapperResolveClient()
-    try:
-        _logger.info(f"Sending resolve request to url: {_config.mapper_resolve_api_url}")
-        resolve_response = await resolve_client.resolve_request(
-            resolve_request, headers, _config.mapper_resolve_api_url
-        )
-        return resolve_response, None
-    except Exception as e:
-        _logger.error(f"Failed to resolve the request: {e}")
-        error_msg = f"Failed to resolve the request: {e}"
-        return None, error_msg
+    mapper = MapperFactory.get_component().get_mapper()
+    resolve_response: ResolveResponse = await mapper.resolve(resolve_request)
+    if not resolve_response:
+        return None, "Failed to resolve the request"
+    return resolve_response, None
 
 
 def process_and_store_resolution(
@@ -133,38 +123,39 @@ def process_and_store_resolution(
     session,
 ):
     _logger.info("Processing and storing resolution")
-    resolve_helper = ResolveHelper.get_component()
     disbursement_resolution_financial_address_list = []
     batch_has_error = False
-    for single_response in resolve_response.message.resolve_response:
+    _logger.info("Iterating through resolved responses")
+    _logger.info(f"Processing {len(resolve_response.results)} resolved responses")
+    _logger.info(f"Resolve Response Details: {resolve_response.results}")
+    for single_response in resolve_response.results:
         _logger.info(f"Processing the response for beneficiary: {single_response.id}")
         disbursement_id = beneficiary_disbursement_map.get(single_response.id)
         if disbursement_id and single_response.fa:
+            # convert single_response.fa to a dict if it's not already
+            if not isinstance(single_response.fa, dict):
+                single_response.fa = single_response.fa.model_dump()
             _logger.info(f"Resolved the request for beneficiary: {single_response.id}")
-            deconstructed_fa = resolve_helper.deconstruct_fa(single_response.fa)
             disbursement_resolution_financial_address = DisbursementResolutionFinancialAddress(
                 disbursement_batch_control_id=disbursement_batch_control_id,
                 disbursement_id=disbursement_id,
                 beneficiary_id=single_response.id,
-                mapper_resolved_fa=single_response.fa,
-                mapper_resolved_name=(
-                    single_response.account_provider_info.name
-                    if single_response.account_provider_info
-                    else None
-                ),
-                bank_account_number=deconstructed_fa.get(FAKeys.account_number.value, None),
-                bank_code=deconstructed_fa.get(FAKeys.bank_code.value, None),
-                branch_code=deconstructed_fa.get(FAKeys.branch_code.value, None),
-                mapper_resolved_fa_type=deconstructed_fa.get(FAKeys.fa_type.value, None),
-                mobile_number=deconstructed_fa.get(FAKeys.mobile_number.value, None),
-                mobile_wallet_provider=deconstructed_fa.get(FAKeys.mobile_wallet_provider.value, None),
-                email_address=deconstructed_fa.get(FAKeys.email_address.value, None),
-                email_wallet_provider=deconstructed_fa.get(FAKeys.email_wallet_provider.value, None),
+                mapper_resolved_fa=str(single_response.fa),
+                mapper_resolved_name=single_response.name,
+                bank_account_number=single_response.fa.get(FAKeys.account_number.value, None),
+                bank_code=single_response.fa.get(FAKeys.bank_code.value, None),
+                branch_code=single_response.fa.get(FAKeys.branch_code.value, None),
+                mapper_resolved_fa_type=single_response.fa.get(FAKeys.fa_type.value, None),
+                mobile_number=single_response.fa.get(FAKeys.mobile_number.value, None),
+                mobile_wallet_provider=single_response.fa.get(FAKeys.mobile_wallet_provider.value, None),
+                email_address=single_response.fa.get(FAKeys.email_address.value, None),
+                email_wallet_provider=single_response.fa.get(FAKeys.email_wallet_provider.value, None),
             )
             disbursement_resolution_financial_address_list.append(disbursement_resolution_financial_address)
         else:
             _logger.error(f"Failed to resolve the request for beneficiary: {single_response.id}")
-            batch_has_error = True
+            # batch_has_error = True
+            # Skip if no resolution found for beneficiary
 
     session.add_all(disbursement_resolution_financial_address_list)
     if not batch_has_error:
