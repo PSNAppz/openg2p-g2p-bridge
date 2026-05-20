@@ -53,3 +53,19 @@ class G2PBridgeErrorCodes(enum.Enum):
     DATABASE_CONNECTION_ERROR = "DATABASE_CONNECTION_ERROR"
     DATABASE_QUERY_ERROR = "DATABASE_QUERY_ERROR"
     DATABASE_TRANSACTION_ERROR = "DATABASE_TRANSACTION_ERROR"
+
+
+class G2PBridgeStatusReasonCodeEnum(enum.Enum):
+
+    rjct_version_invalid = "rjct.version.invalid"
+    rjct_message_id_duplicate = "rjct.message_id.duplicate"
+    rjct_message_ts_invalid = "rjct.message_ts.invalid"
+    rjct_action_invalid = "rjct.action.invalid"
+    rjct_action_not_supported = "rjct.action.not_supported"
+    rjct_total_count_invalid = "rjct.total_count.invalid"
+    rjct_total_count_limit_exceeded = "rjct.total_count.limit_exceeded"
+    rjct_errors_too_many = "rjct.errors.too_many"
+    rjct_jwt_invalid = "rjct.jwt.invalid"
+    rjct_file_size_exceeded = "rjct.file.size.exceeded"
+    rjct_file_type_invalid = "rjct.file.type.invalid"
+    rjct_virus_check_failed = "rjct.virus.check.failed"

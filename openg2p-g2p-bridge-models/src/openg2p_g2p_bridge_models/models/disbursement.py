@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import DateTime, Float, Integer, String
+from sqlalchemy import DateTime, Float, Integer, String, JSON
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import BaseORMModelWithId
@@ -26,6 +26,7 @@ class Disbursement(BaseORMModelWithId):
     beneficiary_id: Mapped[str] = mapped_column(String)
     beneficiary_name: Mapped[str] = mapped_column(String, nullable=True, default=None)
     disbursement_quantity: Mapped[float] = mapped_column(Float)
+    compute_elements: Mapped[dict] = mapped_column(JSON, nullable=True, default=None)
     narrative: Mapped[str] = mapped_column(String)
     receipt_time_stamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
     cancellation_status: Mapped[DisbursementCancellationStatus] = mapped_column(

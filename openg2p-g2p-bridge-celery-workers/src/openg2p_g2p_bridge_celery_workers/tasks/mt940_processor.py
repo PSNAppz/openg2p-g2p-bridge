@@ -63,6 +63,7 @@ def mt940_processor_worker(statement_id: str):
             transaction_reference_parser = mt940.tags.TransactionReferenceNumber()
 
             statement_parser = mt940.tags.Statement()
+            _logger.info(f"Parsing MT940 statement for statement id: {statement_id}")
             mt940_statement = mt940.models.Transactions(
                 processors={
                     "pre_statement": [mt940.processors.add_currency_pre_processor("")],
@@ -82,11 +83,19 @@ def mt940_processor_worker(statement_id: str):
             account_statement.statement_number = mt940_statement.data.get("statement_number", "")
             account_statement.sequence_number = mt940_statement.data.get("sequence_number", "")
             _logger.info("Parsed account statement header")
+            _logger.info(
+                "Account number: %s, Reference number: %s, Statement number: %s, Sequence number: %s",
+                account_statement.account_number,
+                account_statement.reference_number,
+                account_statement.statement_number,
+                account_statement.sequence_number,
+            )
+
             # Get the benefit program configuration
-            sponsor_bank_configuration: SponsorBankConfiguration = (
-                WarehouseHelper.get_component().retrieve_sponsor_bank_configuration_for_account_number(
-                    account_statement.account_number
-                )
+            sponsor_bank_configuration: (
+                SponsorBankConfiguration
+            ) = WarehouseHelper.get_component().retrieve_sponsor_bank_configuration_for_account_number(
+                account_statement.account_number
             )
 
             if not sponsor_bank_configuration:
@@ -114,7 +123,7 @@ def mt940_processor_worker(statement_id: str):
             for transaction in mt940_statement:
                 entry_sequence += 1
                 debit_credit_indicator = transaction.data["status"]
-
+                _logger.info(f"Debit/Credit Indicator:{transaction.data['status']}")
                 if debit_credit_indicator in ["D"]:
                     parsed_transaction = construct_parsed_transaction(
                         bank_connector,
@@ -149,9 +158,6 @@ def mt940_processor_worker(statement_id: str):
                 statement_id,
             )
 
-            # Add disbursement_recons_d to session before processing reversal transactions
-            session.add_all(disbursement_recons_d)
-
             # Start processing reversal transactions - rd
             disbursement_recons_rd = []
             process_reversal_of_debits(
@@ -162,8 +168,6 @@ def mt940_processor_worker(statement_id: str):
                 session,
                 statement_id,
             )
-
-            session.add_all(disbursement_recons_rd)
 
             update_envelope_batch_status_reconciled(disbursement_recons_d, session)
             update_envelope_batch_status_reversed(disbursement_recons_rd, session)
@@ -205,9 +209,11 @@ def process_reversal_of_debits(
     session,
     statement_id,
 ):
+    _logger.info(f"Processing reversal of debits for statement: {statement_id}")
     for parsed_transaction in parsed_transactions_rd:
         disbursement: Disbursement | None = check_valid_disbursement_id(parsed_transaction, session)
         disbursement_batch_control_geo: DisbursementBatchControlGeo | None = None
+        _logger.info(f"Disbursement ID from parsed_transaction: {disbursement}")
 
         if not disbursement:
             disbursement_batch_control_geo = check_valid_disbursement_batch_control_geo_id(
@@ -245,6 +251,7 @@ def process_reversal_of_debits(
                 account_statement.statement_number,
                 account_statement.sequence_number,
             )
+            session.add(disbursement_recon)
             disbursement_recons_rd.append(disbursement_recon)
 
 
@@ -256,10 +263,11 @@ def process_debit_transactions(
     session,
     statement_id,
 ):
+    _logger.info(f"Processing debit transactions for statement: {statement_id}")
     for parsed_transaction in parsed_transactions_d:
         disbursement: Disbursement | None = check_valid_disbursement_id(parsed_transaction, session)
         disbursement_batch_control_geo: DisbursementBatchControlGeo | None = None
-
+        _logger.info(f"Disbursement ID from parsed_transaction: {disbursement}")
         if not disbursement:
             disbursement_batch_control_geo = check_valid_disbursement_batch_control_geo_id(
                 parsed_transaction, session
@@ -299,10 +307,14 @@ def process_debit_transactions(
             account_statement.sequence_number,
             session,
         )
+        session.add(disbursement_recon)
         disbursement_recons_d.append(disbursement_recon)
 
 
 def get_disbursement_recon(parsed_transaction, session):
+    _logger.info(
+        f"Looking up DisbursementRecon for reconciliation_id: {parsed_transaction['reconciliation_id']}"
+    )
     disbursement_recon = (
         session.query(DisbursementRecon)
         .filter(DisbursementRecon.disbursement_id == parsed_transaction["reconciliation_id"])
@@ -316,6 +328,7 @@ def get_disbursement_recon(parsed_transaction, session):
             )
             .first()
         )
+    _logger.info(f"DisbursementRecon found: {disbursement_recon}")
     return disbursement_recon
 
 
@@ -357,7 +370,7 @@ def construct_disbursement_error_recon(
         entry_sequence=parsed_transaction["remittance_entry_sequence"],
         entry_date=parsed_transaction["remittance_entry_date"],
         value_date=parsed_transaction["remittance_value_date"],
-        error_reason=g2p_bridge_error_code,
+        error_reason=g2p_bridge_error_code.value,
         reconciliation_id=parsed_transaction["reconciliation_id"],
         bank_reference_number=parsed_transaction["remittance_reference_number"],
     )
@@ -389,6 +402,8 @@ def construct_new_disbursement_recon(
     statement_sequence,
     session,
 ):
+    if disbursement:
+        _logger.info(f"Disbursement ID For Recon: {disbursement.id}")
     disbursement_recon = DisbursementRecon(
         # If disbursement is present, then it is for DIGITAL CASH
         disbursement_batch_control_id=disbursement.disbursement_batch_control_id if disbursement else None,
@@ -452,7 +467,6 @@ def construct_parsed_transaction(
     parsed_transaction.update(
         {
             "reconciliation_id": reconciliation_id,
-            # "disbursement_envelope_id": disbursement_envelope_id,
             "transaction_amount": transaction_amount,
             "debit_credit_indicator": debit_credit_indicator,
             "beneficiary_name_from_bank": beneficiary_name_from_bank,
@@ -542,8 +556,6 @@ def update_envelope_batch_status_reversed(disbursement_recons: List[Disbursement
 
     # Update the disbursement envelope batch status
     for disbursement_envelope_id, count in disbursement_envelope_id_count.items():
-        _logger.info(f"Disbursement envelope id: {disbursement_envelope_id}, count: {count}")
-
         max_retries = 5
         last_exc = None
 

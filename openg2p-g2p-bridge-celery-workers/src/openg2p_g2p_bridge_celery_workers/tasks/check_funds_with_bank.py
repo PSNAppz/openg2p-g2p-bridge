@@ -52,14 +52,17 @@ def check_funds_with_bank_worker(disbursement_envelope_id: str):
             )
             return
 
-        sponsor_bank_configuration: SponsorBankConfiguration = (
-            WarehouseHelper.get_component().retrieve_sponsor_bank_configuration(
-                disbursement_envelope.benefit_program_id,
-                disbursement_envelope.benefit_code_id,
-            )
+        sponsor_bank_configuration: (
+            SponsorBankConfiguration
+        ) = WarehouseHelper.get_component().retrieve_sponsor_bank_configuration(
+            disbursement_envelope.benefit_program_id,
+            disbursement_envelope.benefit_code_id,
         )
 
         total_funds_needed = disbursement_envelope.total_disbursement_quantity
+        _logger.info(
+            f"Check funds in bank {sponsor_bank_configuration.sponsor_bank_code} for account {sponsor_bank_configuration.program_account_number} for amount {total_funds_needed} {disbursement_envelope.measurement_unit}"
+        )
         bank_connector = BankConnectorFactory.get_component().get_bank_connector(
             sponsor_bank_configuration.sponsor_bank_code
         )

@@ -1,7 +1,17 @@
 import datetime
 from typing import List, Optional
 
-from openg2p_g2pconnect_common_lib.schemas import Request, SyncResponse
+from openg2p_fastapi_common.schemas import (
+    G2PRequest,
+    G2PRequestHeader,
+    G2PRequestBody,
+    G2PPaginationRequest,
+    G2PResponse,
+    G2PResponseHeader,
+    G2PResponseBody,
+    G2PPaginationResponse,
+    G2PResponseStatus,
+)
 from pydantic import BaseModel
 
 from ..errors.codes import G2PBridgeErrorCodes
@@ -14,6 +24,7 @@ from ..models import (
 )
 
 
+# Disbursement Envelope
 class DisbursementEnvelopePayload(BaseModel):
     id: Optional[str] = None
     benefit_program_id: Optional[int] = None
@@ -37,16 +48,23 @@ class DisbursementEnvelopePayload(BaseModel):
     cancellation_timestamp: Optional[datetime.datetime] = None
 
 
-class DisbursementEnvelopeRequest(Request):
-    message: List[DisbursementEnvelopePayload]
+class DisbursementEnvelopeRequestBody(G2PRequestBody):
+    request_payload: List[DisbursementEnvelopePayload]
 
 
-class DisbursementEnvelopeResponse(SyncResponse):
-    message: Optional[List[DisbursementEnvelopePayload]] = None
+class DisbursementEnvelopeRequest(G2PRequest):
+    request_body: DisbursementEnvelopeRequestBody
 
 
-class DisbursementStatusRequest(Request):
-    message: List[str]
+class DisbursementEnvelopeResponseBody(G2PResponseBody):
+    response_payload: Optional[List[DisbursementEnvelopePayload]] = None
+
+
+class DisbursementEnvelopeResponse(G2PResponse):
+    response_body: DisbursementEnvelopeResponseBody
+
+
+# Disbursement Status
 
 
 class DisbursementReconPayload(BaseModel):
@@ -95,12 +113,20 @@ class DisbursementStatusPayload(BaseModel):
     disbursement_recon_records: Optional[DisbursementReconRecords] = None
 
 
-class DisbursementStatusResponse(SyncResponse):
-    message: Optional[List[DisbursementStatusPayload]] = None
+class DisbursementStatusRequestBody(G2PRequestBody):
+    request_payload: List[str]
 
 
-class DisbursementEnvelopeStatusRequest(Request):
-    message: str
+class DisbursementStatusRequest(G2PRequest):
+    request_body: DisbursementStatusRequestBody
+
+
+class DisbursementStatusResponseBody(G2PResponseBody):
+    response_payload: Optional[List[DisbursementStatusPayload]] = None
+
+
+class DisbursementStatusResponse(G2PResponse):
+    response_body: DisbursementStatusResponseBody
 
 
 class DisbursementBatchControlGeoPayload(BaseModel):
@@ -124,6 +150,7 @@ class DisbursementBatchControlGeoPayload(BaseModel):
     agency_notification_status: Optional[str] = None
 
 
+# Disbursement Envelope Status
 class DisbursementEnvelopeStatusPayload(BaseModel):
     disbursement_envelope_id: str
     benefit_code_id: Optional[int] = None
@@ -161,5 +188,17 @@ class DisbursementEnvelopeStatusPayload(BaseModel):
     disbursement_batch_control_geos: Optional[List[DisbursementBatchControlGeoPayload]] = None
 
 
-class DisbursementEnvelopeStatusResponse(SyncResponse):
-    message: Optional[DisbursementEnvelopeStatusPayload] = None
+class DisbursementEnvelopeStatusRequestBody(G2PRequestBody):
+    request_payload: str
+
+
+class DisbursementEnvelopeStatusRequest(G2PRequest):
+    request_body: DisbursementEnvelopeStatusRequestBody
+
+
+class DisbursementEnvelopeStatusResponseBody(G2PResponseBody):
+    response_payload: Optional[DisbursementEnvelopeStatusPayload] = None
+
+
+class DisbursementEnvelopeStatusResponse(G2PResponse):
+    response_body: DisbursementEnvelopeStatusResponseBody

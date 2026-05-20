@@ -38,6 +38,7 @@ _logger = logging.getLogger("agency_notification_worker")
 
 @celery_app.task(name="agency_notification_worker")
 def agency_notification_worker(disbursement_batch_control_geo_id: str) -> None:
+    _logger.info(f"Starting agency notification for geo: {disbursement_batch_control_geo_id}")
     session_maker = sessionmaker(bind=_engine.get("db_engine_bridge"), expire_on_commit=False)
     with session_maker() as session:
         disbursement_batch_control_geo: Optional[DisbursementBatchControlGeo] = None
@@ -180,6 +181,9 @@ def agency_notification_worker(disbursement_batch_control_geo_id: str) -> None:
             disbursement_batch_control_geo.agency_notification_status = ProcessStatus.PROCESSED.value
             session.add(notification_log)
             session.commit()
+            _logger.info(
+                f"Agency notification completed successfully for geo: {disbursement_batch_control_geo_id}"
+            )
 
         except Exception as e:
             session.rollback()
@@ -203,6 +207,7 @@ def construct_agency_notification_payload(
     beneficiary_entitlements,
     disbursement_batch_control_geo_attributes,
 ):
+    _logger.info("Constructing agency notification payload")
     notification_payload = AgencyNotificationPayload(
         program_mnemonic=getattr(disbursement_envelope, "benefit_program_mnemonic", None),
         program_description=getattr(disbursement_envelope, "benefit_program_description", None),
@@ -242,4 +247,5 @@ def construct_agency_notification_payload(
         beneficiary_entitlements=beneficiary_entitlements,
     )
 
+    _logger.info("Agency notification payload constructed successfully")
     return notification_payload

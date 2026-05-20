@@ -17,7 +17,6 @@ classifiers = [
 ]
 dependencies = [
   "openg2p-g2p-bridge-models",
-  "openg2p-g2p-bridge-bank-connectors",
   "celery[redis]",
   "psycopg2",
   "asyncpg",

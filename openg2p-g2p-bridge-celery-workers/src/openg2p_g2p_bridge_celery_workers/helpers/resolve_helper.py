@@ -2,7 +2,6 @@ import base64
 import enum
 import logging
 import re
-import uuid
 from datetime import datetime, timedelta, timezone
 from typing import List
 
@@ -10,11 +9,8 @@ import httpx
 import orjson
 from openg2p_fastapi_common.service import BaseService
 from openg2p_g2p_bridge_models.models import MapperResolvedFaType
-from openg2p_g2pconnect_common_lib.schemas import RequestHeader
-from openg2p_g2pconnect_mapper_lib.schemas import (
+from openg2p_g2p_bridge_mapper_connectors.schemas import (
     ResolveRequest,
-    ResolveRequestMessage,
-    SingleResolveRequest,
 )
 from pydantic import BaseModel
 
@@ -47,42 +43,12 @@ class ResolveHelper(BaseService):
         self._keymanager_auth_token: str = None
         self._keymanager_auth_token_expiry: datetime = None
 
-    def construct_single_resolve_request(self, id: str) -> SingleResolveRequest:
-        _logger.info(f"Constructing single resolve request for ID: {id}")
-        single_resolve_request = SingleResolveRequest(
-            reference_id=str(uuid.uuid4()),
-            timestamp=str(datetime.now()),
-            id=id,
-            scope="details",
-        )
-        _logger.info(f"Constructed single resolve request for ID: {id}")
-        return single_resolve_request
-
-    def construct_resolve_request(
-        self, single_resolve_requests: List[SingleResolveRequest]
-    ) -> ResolveRequest:
-        _logger.info(
-            f"Constructing resolve request for {len(single_resolve_requests)} single resolve requests"
-        )
-        resolve_request_message = ResolveRequestMessage(
-            transaction_id=str(uuid.uuid4()),
-            resolve_request=single_resolve_requests,
-        )
-
+    def construct_resolve_request(self, beneficiary_ids: List[str]) -> ResolveRequest:
+        _logger.info(f"Constructing resolve request for {len(beneficiary_ids)} beneficiary IDs")
         resolve_request = ResolveRequest(
-            header=RequestHeader(
-                message_id=str(uuid.uuid4()),
-                message_ts=str(datetime.now()),
-                action="resolve",
-                sender_id=_config.mapper_request_sender_id,
-                sender_uri="",
-                total_count=len(single_resolve_requests),
-            ),
-            message=resolve_request_message,
+            beneficiary_ids=beneficiary_ids,
         )
-        _logger.info(
-            f"Constructed resolve request for {len(single_resolve_requests)} single resolve requests"
-        )
+        _logger.info(f"Constructed resolve request for {len(beneficiary_ids)} single resolve requests")
         return resolve_request
 
     def _deconstruct(self, value: str, strategy: str) -> List[KeyValuePair]:
@@ -92,7 +58,11 @@ class ResolveHelper(BaseService):
         if regex_res:
             regex_res = regex_res.groupdict()
             try:
-                deconstructed_list = [KeyValuePair(key=k, value=v) for k, v in regex_res.items()]
+                # Coalesce None (from optional groups) to empty strings
+                deconstructed_list = [
+                    KeyValuePair(key=FAKeys(k), value=(v if v is not None else ""))
+                    for k, v in regex_res.items()
+                ]
             except Exception as e:
                 _logger.error(f"Error while deconstructing ID/FA: {e}")
                 raise ValueError("Error while deconstructing ID/FA") from e
@@ -102,9 +72,11 @@ class ResolveHelper(BaseService):
     def deconstruct_fa(self, fa: str) -> dict:
         _logger.info("Deconstructing FA")
         deconstruct_strategy = self._get_deconstruct_strategy(fa)
+        _logger.info(f"Deconstruction strategy: {deconstruct_strategy}")
         if deconstruct_strategy:
             deconstructed_pairs = self._deconstruct(fa, deconstruct_strategy)
             deconstructed_fa = {pair.key.value: pair.value for pair in deconstructed_pairs}
+            _logger.info(f"Deconstructed FA Returning: {deconstructed_fa}")
             return deconstructed_fa
         return {}
 

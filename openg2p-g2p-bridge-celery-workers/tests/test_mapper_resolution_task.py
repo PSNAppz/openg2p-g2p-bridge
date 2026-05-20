@@ -210,7 +210,7 @@ def mock_resolve_client():
 
 def test_mapper_resolution_worker_success(mock_session_maker, mock_resolve_helper, mock_resolve_client):
     mock_response = MagicMock()
-    mock_response.message.resolve_response = [
+    mock_response.response_body.resolve_response = [
         MagicMock(
             id="test_beneficiary_id",
             fa="test_fa",
@@ -309,7 +309,7 @@ async def test_make_resolve_request_failure(mock_resolve_helper, mock_resolve_cl
 
 def test_process_and_store_resolution_success(mock_session_maker, mock_resolve_helper):
     mock_response = MagicMock()
-    mock_response.message.resolve_response = [
+    mock_response.response_body.resolve_response = [
         MagicMock(
             id="test_beneficiary_id",
             fa="test_fa",
@@ -342,7 +342,7 @@ def test_process_and_store_resolution_success(mock_session_maker, mock_resolve_h
 
 def test_process_and_store_resolution_failure(mock_session_maker, mock_resolve_helper):
     mock_response = MagicMock()
-    mock_response.message.resolve_response = [MagicMock(id="test_beneficiary_id", fa=None)]
+    mock_response.response_body.resolve_response = [MagicMock(id="test_beneficiary_id", fa=None)]
     beneficiary_map = {"test_beneficiary_id": "test_disbursement_id"}
 
     process_and_store_resolution("test_batch_control_id", mock_response, beneficiary_map, mock_session_maker)
